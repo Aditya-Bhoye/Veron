@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VERON — Point-of-Sale Software for Restaurants &amp; Bars</title>
+<meta name="description" content="VERON is offline-first point-of-sale software for restaurants, bars and hotels in India — billing, inventory, staff and customer accounts, with an owner's mobile app." />
+<style>
+  :root {
+    --bg: #0A0A0A;
+    --panel: #161616;
+    --line: rgba(255,255,255,0.10);
+    --text: #F5F5F5;
+    --muted: #9A9A9A;
+    --faint: #6A6A6A;
+    --accent: #D93838;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 22px; }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.3px; }
+  .logo {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), #7a1010);
+    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 15px;
+  }
+  .nav-links { display: flex; gap: 22px; font-size: 14px; }
+  .nav-links a { color: var(--muted); }
+  .nav-links a:hover { color: var(--text); text-decoration: none; }
+  @media (max-width: 640px) { .nav-links { display: none; } }
+
+  /* Hero */
+  .hero { padding: 84px 0 64px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(60% 50% at 50% 0%, rgba(217,56,56,0.22), transparent 70%);
+    pointer-events: none;
+  }
+  .hero h1 { font-size: 44px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+  .hero h1 span { color: var(--accent); }
+  .hero p { color: var(--muted); font-size: 18px; max-width: 620px; margin: 18px auto 0; }
+  @media (max-width: 640px) { .hero h1 { font-size: 32px; } .hero p { font-size: 16px; } }
+
+  /* Sections */
+  section { padding: 54px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 8px; }
+  .sub { color: var(--muted); margin-bottom: 28px; }
+
+  /* Features */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 16px; padding: 22px;
+  }
+  .card h3 { font-size: 16px; margin-bottom: 6px; }
+  .card p { color: var(--muted); font-size: 14px; }
+
+  /* Pricing */
+  .prices { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .plan { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 26px; }
+  .plan.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .plan .name { font-size: 15px; color: var(--muted); font-weight: 600; }
+  .plan .price { font-size: 34px; font-weight: 800; margin: 8px 0 2px; }
+  .plan .price small { font-size: 15px; color: var(--muted); font-weight: 500; }
+  .plan ul { list-style: none; margin-top: 16px; }
+  .plan li { color: var(--muted); font-size: 14px; padding: 6px 0 6px 24px; position: relative; }
+  .plan li::before { content: "✓"; color: var(--accent); position: absolute; left: 0; font-weight: 800; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 20px; padding: 2px 10px; margin-bottom: 12px; }
+  .note { color: var(--faint); font-size: 13px; margin-top: 18px; }
+
+  /* Policy text */
+  .policy p { color: var(--muted); margin-bottom: 12px; }
+  .policy h3 { font-size: 17px; margin: 22px 0 8px; color: var(--text); }
+  .policy ul { color: var(--muted); margin: 8px 0 12px 20px; }
+  .policy li { margin-bottom: 6px; }
+
+  /* Contact */
+  .contact-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 26px; }
+  .contact-box div { margin-bottom: 10px; }
+  .contact-box .label { color: var(--faint); font-size: 13px; }
+  .contact-box .value { font-size: 16px; font-weight: 600; }
+
+  footer { border-top: 1px solid var(--line); padding: 34px 0; color: var(--faint); font-size: 13px; text-align: center; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="logo">V</span> VERON</div>
+    <nav class="nav-links">
+      <a href="#features">Product</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#refund">Refunds</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Point-of-sale software<br />built for <span>restaurants &amp; bars</span></h1>
+    <p>VERON runs your billing, inventory, staff and customer accounts on your own computer — fully offline — with an owner's mobile app that shows your sales live from anywhere.</p>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <h2>What VERON does</h2>
+    <p class="sub">Everything a busy counter needs, on the machine you already own.</p>
+    <div class="grid">
+      <div class="card"><h3>Fast billing</h3><p>Tables, rooms and quick sales. Split payments, discounts and tax, built for a busy floor.</p></div>
+      <div class="card"><h3>Live inventory</h3><p>Stock counts that update as you sell, with low-stock alerts before you run out.</p></div>
+      <div class="card"><h3>Staff &amp; attendance</h3><p>Track attendance, salaries and advances — one running account per staff member.</p></div>
+      <div class="card"><h3>Customer accounts</h3><p>Record udhari, take payments, and keep a clear ledger for every customer.</p></div>
+      <div class="card"><h3>Works offline</h3><p>No internet needed to bill. Everything is on your computer; the cloud is a backup, not a dependency.</p></div>
+      <div class="card"><h3>Owner's mobile app</h3><p>See today's sales, staff and stock live on your phone — wherever you are.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <h2>Simple monthly pricing</h2>
+    <p class="sub">One licence per shop. A 7-day free trial is available before you pay. Prices in INR, per month.</p>
+    <div class="prices">
+      <div class="plan">
+        <div class="name">Offline</div>
+        <div class="price">₹999 <small>/ month</small></div>
+        <ul>
+          <li>Full point-of-sale</li>
+          <li>Billing, inventory, staff, customers</li>
+          <li>Works with no internet</li>
+        </ul>
+      </div>
+      <div class="plan featured">
+        <div class="badge">POPULAR</div>
+        <div class="name">Owner Cloud</div>
+        <div class="price">₹1,599 <small>/ month</small></div>
+        <ul>
+          <li>Everything in Offline</li>
+          <li>Cloud backup</li>
+          <li>Owner's mobile app</li>
+          <li>Daily WhatsApp sales report</li>
+        </ul>
+      </div>
+      <div class="plan">
+        <div class="name">Business</div>
+        <div class="price">₹2,499 <small>/ month</small></div>
+        <ul>
+          <li>Everything in Owner Cloud</li>
+          <li>Waiter app</li>
+          <li>Multiple counters</li>
+          <li>Multiple outlets</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">The licence is digital and activates instantly inside the app on payment. No physical goods are shipped. There is no auto-renewal — your licence simply expires at the end of the month unless you choose to pay again.</p>
+  </div>
+</section>
+
+<section id="terms" class="policy">
+  <div class="wrap">
+    <h2>Terms &amp; Conditions</h2>
+    <p>By purchasing a VERON licence, you agree to the following terms.</p>
+    <h3>The licence</h3>
+    <ul>
+      <li>A VERON licence is valid for 30 days from the date of payment and unlocks the software for one shop.</li>
+      <li>The licence is delivered digitally and activates inside the application immediately after payment. Nothing is shipped.</li>
+      <li>Prices are in Indian Rupees (INR) and are charged per month, per shop.</li>
+      <li>A 7-day free trial is available on each computer, once.</li>
+    </ul>
+    <h3>Acceptable use</h3>
+    <ul>
+      <li>The software is licensed to you for use in your own business. You may not resell, redistribute or reverse-engineer it.</li>
+      <li>You are responsible for the accuracy of the data you enter and for keeping your own backups of your business records.</li>
+    </ul>
+    <h3>Liability</h3>
+    <ul>
+      <li>VERON is provided on an “as-is” basis. We are not liable for business losses arising from misuse, hardware failure, or loss of your own device or data.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="refund" class="policy">
+  <div class="wrap">
+    <h2>Refund &amp; Cancellation Policy</h2>
+    <ul>
+      <li>A <strong>7-day free trial</strong> is available before any payment, so you can evaluate VERON fully before buying.</li>
+      <li>Because the licence is delivered digitally and activates immediately, <strong>payments are non-refundable</strong> once the licence has been issued.</li>
+      <li><strong>Duplicate or erroneous charges are refunded in full</strong>, within 5–7 working days of being reported to us.</li>
+      <li>There is <strong>no auto-renewal</strong> and no card is stored. Your licence simply expires at the end of the 30 days unless you choose to pay again — so there is nothing to cancel.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="privacy" class="policy">
+  <div class="wrap">
+    <h2>Privacy Policy</h2>
+    <p>We collect only what is needed to provide the software and process your payment.</p>
+    <ul>
+      <li>Account details (name, email, phone) are used to create and support your account.</li>
+      <li>Your business data (bills, inventory, staff, customers) is stored on your own computer. On paid plans it is also backed up to secure cloud storage, scoped privately to your outlet.</li>
+      <li>Payments are processed by our payment provider. We do not store your card or bank details on our systems.</li>
+      <li>We do not sell your data to anyone.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <h2>Contact Us</h2>
+    <p class="sub">We're happy to help before or after you buy.</p>
+    <div class="contact-box">
+      <div><div class="label">Business name</div><div class="value">VERON</div></div>
+      <div><div class="label">Email</div><div class="value"><a href="mailto:verontechapp@gmail.com">verontechapp@gmail.com</a></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    © <span id="yr"></span> VERON. All rights reserved. &nbsp;·&nbsp;
+    <a href="#terms">Terms</a> &nbsp;·&nbsp;
+    <a href="#refund">Refunds</a> &nbsp;·&nbsp;
+    <a href="#privacy">Privacy</a>
+  </div>
+</footer>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+
+</body>
+</html>
