@@ -4,103 +4,161 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>VERON — Point-of-Sale Software for Restaurants &amp; Bars</title>
-<meta name="description" content="VERON is offline-first point-of-sale software for restaurants, bars and hotels in India — billing, inventory, staff and customer accounts, with an owner's mobile app." />
+<meta name="description" content="VERON is offline-first point-of-sale software for restaurants, bars and hotels in India — fast billing, live inventory, staff and customer accounts, with an owner's mobile app that shows your sales live." />
+<meta property="og:title" content="VERON — Point-of-Sale for Restaurants & Bars" />
+<meta property="og:description" content="Fast billing, live inventory, staff and customer accounts. Works fully offline, with an owner's mobile app." />
 <style>
-  :root {
-    --bg: #0A0A0A;
-    --panel: #161616;
-    --line: rgba(255,255,255,0.10);
-    --text: #F5F5F5;
-    --muted: #9A9A9A;
-    --faint: #6A6A6A;
-    --accent: #D93838;
+  :root{
+    --bg:#0B0B0C; --bg2:#111113; --panel:#161618; --panel2:#1C1C1F;
+    --line:rgba(255,255,255,0.08); --line2:rgba(255,255,255,0.14);
+    --text:#F4F4F5; --muted:#A1A1AA; --faint:#71717A;
+    --accent:#E23B3B; --accent2:#FF6A4D; --ok:#34C759;
+    --r:18px; --maxw:1080px;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-  }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .wrap { max-width: 920px; margin: 0 auto; padding: 0 22px; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent2)}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px;
+    padding:12px 22px;border-radius:12px;transition:.2s;cursor:pointer;border:1px solid transparent}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+    box-shadow:0 8px 24px rgba(226,59,59,0.28)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(226,59,59,0.4)}
+  .btn-ghost{border-color:var(--line2);color:var(--text)}
+  .btn-ghost:hover{background:rgba(255,255,255,0.05);border-color:var(--muted)}
 
   /* Header */
-  header {
-    position: sticky; top: 0; z-index: 10;
-    background: rgba(10,10,10,0.85);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--line);
-  }
-  .nav { display: flex; align-items: center; justify-content: space-between; height: 62px; }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.3px; }
-  .logo {
-    width: 30px; height: 30px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--accent), #7a1010);
-    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 15px;
-  }
-  .nav-links { display: flex; gap: 22px; font-size: 14px; }
-  .nav-links a { color: var(--muted); }
-  .nav-links a:hover { color: var(--text); text-decoration: none; }
-  @media (max-width: 640px) { .nav-links { display: none; } }
+  header{position:sticky;top:0;z-index:50;background:rgba(11,11,12,0.72);
+    backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-0.4px}
+  .logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#8f1414);
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px;
+    box-shadow:0 4px 14px rgba(226,59,59,0.35)}
+  .nav-links{display:flex;gap:28px;font-size:14px;color:var(--muted)}
+  .nav-links a:hover{color:var(--text)}
+  @media(max-width:760px){.nav-links{display:none}}
 
   /* Hero */
-  .hero { padding: 84px 0 64px; text-align: center; position: relative; overflow: hidden; }
-  .hero::before {
-    content: ""; position: absolute; inset: 0;
-    background: radial-gradient(60% 50% at 50% 0%, rgba(217,56,56,0.22), transparent 70%);
-    pointer-events: none;
-  }
-  .hero h1 { font-size: 44px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
-  .hero h1 span { color: var(--accent); }
-  .hero p { color: var(--muted); font-size: 18px; max-width: 620px; margin: 18px auto 0; }
-  @media (max-width: 640px) { .hero h1 { font-size: 32px; } .hero p { font-size: 16px; } }
+  .hero{position:relative;padding:92px 0 40px;overflow:hidden}
+  .hero::before{content:"";position:absolute;top:-160px;left:50%;transform:translateX(-50%);
+    width:900px;height:600px;background:radial-gradient(closest-side,rgba(226,59,59,0.28),transparent 70%);
+    filter:blur(20px);pointer-events:none}
+  .hero-grid{position:relative;display:grid;grid-template-columns:1.05fr 0.95fr;gap:48px;align-items:center}
+  @media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:40px;text-align:center}}
+  .hero h1{font-size:52px;font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin:18px 0 0}
+  .hero h1 .grad{background:linear-gradient(120deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lead{color:var(--muted);font-size:19px;margin:20px 0 0;max-width:520px}
+  @media(max-width:900px){.hero p.lead{margin-left:auto;margin-right:auto}}
+  .hero .cta{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}
+  @media(max-width:900px){.hero .cta{justify-content:center}}
+  .hero h1{font-size:clamp(34px,7vw,52px)}
+
+  /* Product mockup (CSS-drawn) */
+  .mock{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line2);
+    border-radius:22px;padding:18px;box-shadow:0 30px 80px rgba(0,0,0,0.55);position:relative}
+  .mock .bar{display:flex;gap:6px;margin-bottom:14px}
+  .mock .bar i{width:11px;height:11px;border-radius:50%;background:#333;display:block}
+  .mock .bar i:first-child{background:#E25555}.mock .bar i:nth-child(2){background:#E2B355}.mock .bar i:nth-child(3){background:#55C27A}
+  .mrow{display:flex;gap:12px;margin-bottom:12px}
+  .mcard{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .mcard .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:1px}
+  .mcard .v{font-size:22px;font-weight:800;margin-top:4px}
+  .mcard .v.green{color:var(--ok)}.mcard .v.red{color:var(--accent2)}
+  .mbars{display:flex;align-items:flex-end;gap:7px;height:74px;padding:12px;background:rgba(255,255,255,0.03);
+    border:1px solid var(--line);border-radius:12px}
+  .mbars span{flex:1;background:linear-gradient(to top,var(--accent),var(--accent2));border-radius:4px 4px 0 0;opacity:.85}
+
+  /* Trust strip */
+  .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2)}
+  .trust .wrap{display:flex;flex-wrap:wrap;gap:14px 40px;justify-content:center;padding:20px 24px}
+  .trust span{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:14px;font-weight:600}
+  .trust svg{width:17px;height:17px;color:var(--ok);flex:none}
 
   /* Sections */
-  section { padding: 54px 0; border-top: 1px solid var(--line); }
-  h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 8px; }
-  .sub { color: var(--muted); margin-bottom: 28px; }
+  section{padding:82px 0}
+  .shead{text-align:center;max-width:640px;margin:0 auto 52px}
+  .shead h2{font-size:clamp(28px,4.5vw,38px);font-weight:800;letter-spacing:-0.8px;margin:12px 0 0}
+  .shead p{color:var(--muted);font-size:17px;margin-top:14px}
 
   /* Features */
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-  .card {
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: 16px; padding: 22px;
-  }
-  .card h3 { font-size: 16px; margin-bottom: 6px; }
-  .card p { color: var(--muted); font-size: 14px; }
+  .feat{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:860px){.feat{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.feat{grid-template-columns:1fr}}
+  .fcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:26px;transition:.2s}
+  .fcard:hover{border-color:var(--line2);transform:translateY(-3px);background:var(--panel2)}
+  .ficon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;margin-bottom:16px;
+    background:linear-gradient(135deg,rgba(226,59,59,0.22),rgba(255,106,77,0.10));border:1px solid rgba(226,59,59,0.3)}
+  .ficon svg{width:22px;height:22px;color:var(--accent2)}
+  .fcard h3{font-size:17px;margin-bottom:7px}
+  .fcard p{color:var(--muted);font-size:14.5px}
+
+  /* Steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:s}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:28px;position:relative}
+  .step .num{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,0.05);border:1px solid var(--line2);
+    display:grid;place-items:center;font-weight:800;color:var(--accent2);margin-bottom:16px}
+  .step h3{font-size:17px;margin-bottom:6px}
+  .step p{color:var(--muted);font-size:14.5px}
 
   /* Pricing */
-  .prices { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-  .plan { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 26px; }
-  .plan.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-  .plan .name { font-size: 15px; color: var(--muted); font-weight: 600; }
-  .plan .price { font-size: 34px; font-weight: 800; margin: 8px 0 2px; }
-  .plan .price small { font-size: 15px; color: var(--muted); font-weight: 500; }
-  .plan ul { list-style: none; margin-top: 16px; }
-  .plan li { color: var(--muted); font-size: 14px; padding: 6px 0 6px 24px; position: relative; }
-  .plan li::before { content: "✓"; color: var(--accent); position: absolute; left: 0; font-weight: 800; }
-  .badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent);
-    border: 1px solid var(--accent); border-radius: 20px; padding: 2px 10px; margin-bottom: 12px; }
-  .note { color: var(--faint); font-size: 13px; margin-top: 18px; }
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
+  @media(max-width:860px){.plans{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+  .plan{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:30px;display:flex;flex-direction:column}
+  .plan.featured{border-color:var(--accent);background:linear-gradient(180deg,rgba(226,59,59,0.08),var(--panel));
+    box-shadow:0 20px 50px rgba(226,59,59,0.16)}
+  .plan .badge{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:1px;color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:20px;padding:4px 12px;margin-bottom:14px}
+  .plan .pname{font-size:15px;color:var(--muted);font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+  .plan .price{font-size:42px;font-weight:800;margin:10px 0 2px;letter-spacing:-1px}
+  .plan .price small{font-size:16px;color:var(--muted);font-weight:500}
+  .plan ul{list-style:none;margin:20px 0 26px;flex:1}
+  .plan li{color:var(--muted);font-size:14.5px;padding:8px 0 8px 28px;position:relative}
+  .plan li::before{content:"";position:absolute;left:0;top:12px;width:16px;height:16px;border-radius:50%;
+    background:rgba(52,199,89,0.15);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2334C759' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center;background-size:11px}
+  .pricenote{text-align:center;color:var(--faint);font-size:13.5px;margin-top:30px;max-width:640px;margin-left:auto;margin-right:auto}
 
-  /* Policy text */
-  .policy p { color: var(--muted); margin-bottom: 12px; }
-  .policy h3 { font-size: 17px; margin: 22px 0 8px; color: var(--text); }
-  .policy ul { color: var(--muted); margin: 8px 0 12px 20px; }
-  .policy li { margin-bottom: 6px; }
+  /* FAQ */
+  .faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+  details{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px 20px;transition:.2s}
+  details[open]{border-color:var(--line2);background:var(--panel2)}
+  summary{cursor:pointer;list-style:none;font-weight:700;font-size:16px;padding:16px 0;
+    display:flex;justify-content:space-between;align-items:center;gap:16px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:22px;color:var(--accent2);font-weight:400;transition:.2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details p{color:var(--muted);font-size:14.5px;padding:0 0 18px}
+
+  /* Policy */
+  .policy{max-width:820px;margin:0 auto}
+  .policy .block{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:30px;margin-bottom:18px}
+  .policy h3{font-size:20px;margin-bottom:14px;letter-spacing:-0.3px}
+  .policy h4{font-size:15px;margin:18px 0 8px;color:var(--text)}
+  .policy p,.policy li{color:var(--muted);font-size:14.5px}
+  .policy ul{margin:8px 0 4px 20px}
+  .policy li{margin-bottom:7px}
 
   /* Contact */
-  .contact-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 26px; }
-  .contact-box div { margin-bottom: 10px; }
-  .contact-box .label { color: var(--faint); font-size: 13px; }
-  .contact-box .value { font-size: 16px; font-weight: 600; }
+  .contact{max-width:560px;margin:0 auto;text-align:center}
+  .contact-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:32px;margin-top:8px}
+  .contact-box .label{color:var(--faint);font-size:12px;text-transform:uppercase;letter-spacing:1px}
+  .contact-box .value{font-size:18px;font-weight:700;margin-top:4px}
+  .contact-box a{color:var(--accent2)}
+  .contact-box .value.brand{font-size:22px}
 
-  footer { border-top: 1px solid var(--line); padding: 34px 0; color: var(--faint); font-size: 13px; text-align: center; }
-  footer a { color: var(--muted); }
+  footer{border-top:1px solid var(--line);padding:40px 0;background:var(--bg2)}
+  .foot{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center}
+  .foot .brand{font-size:17px}
+  .foot-links{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+  .foot-links a:hover{color:var(--text)}
+  .copy{color:var(--faint);font-size:13px;margin-top:20px;text-align:center}
 </style>
 </head>
 <body>
@@ -109,144 +167,252 @@
   <div class="wrap nav">
     <div class="brand"><span class="logo">V</span> VERON</div>
     <nav class="nav-links">
-      <a href="#features">Product</a>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
       <a href="#pricing">Pricing</a>
-      <a href="#refund">Refunds</a>
+      <a href="#faq">FAQ</a>
       <a href="#contact">Contact</a>
     </nav>
+    <a href="#pricing" class="btn btn-primary" style="padding:9px 18px;font-size:14px">See pricing</a>
   </div>
 </header>
 
+<!-- HERO -->
 <div class="hero">
-  <div class="wrap">
-    <h1>Point-of-sale software<br />built for <span>restaurants &amp; bars</span></h1>
-    <p>VERON runs your billing, inventory, staff and customer accounts on your own computer — fully offline — with an owner's mobile app that shows your sales live from anywhere.</p>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Point-of-sale · Made in India</div>
+      <h1>Run your restaurant on software that <span class="grad">never goes down</span></h1>
+      <p class="lead">VERON handles billing, inventory, staff and customer accounts on your own computer — fully offline — with an owner's mobile app that shows your sales live from anywhere.</p>
+      <div class="cta">
+        <a href="#pricing" class="btn btn-primary">Start 7-day free trial</a>
+        <a href="#features" class="btn btn-ghost">Explore features</a>
+      </div>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="mrow">
+        <div class="mcard"><div class="k">Today's sales</div><div class="v green">₹42,180</div></div>
+        <div class="mcard"><div class="k">Open tables</div><div class="v">7</div></div>
+      </div>
+      <div class="mrow">
+        <div class="mcard"><div class="k">Orders</div><div class="v">128</div></div>
+        <div class="mcard"><div class="k">Low stock</div><div class="v red">3</div></div>
+      </div>
+      <div class="mbars">
+        <span style="height:38%"></span><span style="height:62%"></span><span style="height:48%"></span>
+        <span style="height:80%"></span><span style="height:56%"></span><span style="height:92%"></span>
+        <span style="height:70%"></span>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- TRUST -->
+<div class="trust">
+  <div class="wrap">
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Works fully offline</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Your data stays private</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 7-day free trial</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> No card required to try</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
 <section id="features">
   <div class="wrap">
-    <h2>What VERON does</h2>
-    <p class="sub">Everything a busy counter needs, on the machine you already own.</p>
-    <div class="grid">
-      <div class="card"><h3>Fast billing</h3><p>Tables, rooms and quick sales. Split payments, discounts and tax, built for a busy floor.</p></div>
-      <div class="card"><h3>Live inventory</h3><p>Stock counts that update as you sell, with low-stock alerts before you run out.</p></div>
-      <div class="card"><h3>Staff &amp; attendance</h3><p>Track attendance, salaries and advances — one running account per staff member.</p></div>
-      <div class="card"><h3>Customer accounts</h3><p>Record udhari, take payments, and keep a clear ledger for every customer.</p></div>
-      <div class="card"><h3>Works offline</h3><p>No internet needed to bill. Everything is on your computer; the cloud is a backup, not a dependency.</p></div>
-      <div class="card"><h3>Owner's mobile app</h3><p>See today's sales, staff and stock live on your phone — wherever you are.</p></div>
+    <div class="shead">
+      <div class="eyebrow">Everything the counter needs</div>
+      <h2>One app for the whole shop</h2>
+      <p>Built for the pace of a real restaurant floor — on the machine you already own.</p>
+    </div>
+    <div class="feat">
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v16"/></svg></div>
+        <h3>Fast billing</h3><p>Tables, rooms and quick sales. Split payments, discounts and tax — designed for a busy floor, not a spreadsheet.</p>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L12 3 4 7v10l8 4 8-4z"/><path d="M4 7l8 4 8-4M12 11v10"/></svg></div>
+        <h3>Live inventory</h3><p>Stock counts that move as you sell, with low-stock alerts before you run out mid-service.</p>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2M17 3a4 4 0 010 8"/></svg></div>
+        <h3>Staff &amp; attendance</h3><p>Attendance, salaries and advances — one running account per staff member, always clear.</p>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h12"/></svg></div>
+        <h3>Customer accounts</h3><p>Record udhari, take payments, keep a clean ledger for every regular who runs a tab.</p>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10a6 6 0 00-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg></div>
+        <h3>Works offline</h3><p>No internet needed to bill. Everything lives on your computer — the cloud is a backup, not a dependency.</p>
+      </div>
+      <div class="fcard">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+        <h3>Owner's mobile app</h3><p>See today's sales, staff and stock live on your phone — wherever you are, the moment it changes.</p>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- HOW -->
+<section id="how" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="shead">
+      <div class="eyebrow">Up and running today</div>
+      <h2>Three steps to your first bill</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3>Install on your PC</h3><p>Download VERON to your billing computer. No special hardware — it runs on what you have.</p></div>
+      <div class="step"><div class="num">2</div><h3>Set up your shop</h3><p>Add your tables, menu and staff in minutes. Import your items and you're ready to bill.</p></div>
+      <div class="step"><div class="num">3</div><h3>Start selling</h3><p>Ring up orders, take payments, track stock — and watch it all live on your phone.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
 <section id="pricing">
   <div class="wrap">
-    <h2>Simple monthly pricing</h2>
-    <p class="sub">One licence per shop. A 7-day free trial is available before you pay. Prices in INR, per month.</p>
-    <div class="prices">
+    <div class="shead">
+      <div class="eyebrow">Simple, honest pricing</div>
+      <h2>One licence per shop, per month</h2>
+      <p>Start with a 7-day free trial. No card required, no auto-renewal. Prices in INR.</p>
+    </div>
+    <div class="plans">
       <div class="plan">
-        <div class="name">Offline</div>
+        <div class="pname">Offline</div>
         <div class="price">₹999 <small>/ month</small></div>
         <ul>
-          <li>Full point-of-sale</li>
-          <li>Billing, inventory, staff, customers</li>
+          <li>Full point-of-sale billing</li>
+          <li>Inventory, staff &amp; customers</li>
           <li>Works with no internet</li>
+          <li>All reports on the PC</li>
         </ul>
+        <a href="#contact" class="btn btn-ghost" style="justify-content:center">Get started</a>
       </div>
       <div class="plan featured">
-        <div class="badge">POPULAR</div>
-        <div class="name">Owner Cloud</div>
+        <div class="badge">MOST POPULAR</div>
+        <div class="pname">Owner Cloud</div>
         <div class="price">₹1,599 <small>/ month</small></div>
         <ul>
           <li>Everything in Offline</li>
-          <li>Cloud backup</li>
+          <li>Secure cloud backup</li>
           <li>Owner's mobile app</li>
           <li>Daily WhatsApp sales report</li>
         </ul>
+        <a href="#contact" class="btn btn-primary" style="justify-content:center">Start free trial</a>
       </div>
       <div class="plan">
-        <div class="name">Business</div>
+        <div class="pname">Business</div>
         <div class="price">₹2,499 <small>/ month</small></div>
         <ul>
           <li>Everything in Owner Cloud</li>
-          <li>Waiter app</li>
-          <li>Multiple counters</li>
+          <li>Waiter ordering app</li>
+          <li>Multiple billing counters</li>
           <li>Multiple outlets</li>
         </ul>
+        <a href="#contact" class="btn btn-ghost" style="justify-content:center">Get started</a>
       </div>
     </div>
-    <p class="note">The licence is digital and activates instantly inside the app on payment. No physical goods are shipped. There is no auto-renewal — your licence simply expires at the end of the month unless you choose to pay again.</p>
+    <p class="pricenote">The licence is digital and activates instantly inside the app on payment — nothing is shipped. There is no auto-renewal and no card is stored; your licence simply expires at the end of the month unless you choose to renew.</p>
   </div>
 </section>
 
-<section id="terms" class="policy">
+<!-- FAQ -->
+<section id="faq" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
   <div class="wrap">
-    <h2>Terms &amp; Conditions</h2>
-    <p>By purchasing a VERON licence, you agree to the following terms.</p>
-    <h3>The licence</h3>
-    <ul>
-      <li>A VERON licence is valid for 30 days from the date of payment and unlocks the software for one shop.</li>
-      <li>The licence is delivered digitally and activates inside the application immediately after payment. Nothing is shipped.</li>
-      <li>Prices are in Indian Rupees (INR) and are charged per month, per shop.</li>
-      <li>A 7-day free trial is available on each computer, once.</li>
-    </ul>
-    <h3>Acceptable use</h3>
-    <ul>
-      <li>The software is licensed to you for use in your own business. You may not resell, redistribute or reverse-engineer it.</li>
-      <li>You are responsible for the accuracy of the data you enter and for keeping your own backups of your business records.</li>
-    </ul>
-    <h3>Liability</h3>
-    <ul>
-      <li>VERON is provided on an “as-is” basis. We are not liable for business losses arising from misuse, hardware failure, or loss of your own device or data.</li>
-    </ul>
+    <div class="shead"><div class="eyebrow">Good to know</div><h2>Frequently asked questions</h2></div>
+    <div class="faq">
+      <details><summary>Does VERON need the internet to work?</summary><p>No. VERON runs fully offline on your computer — you can bill all day with no connection. Internet is only used to back up your data and to power the owner's mobile app on the paid plans.</p></details>
+      <details><summary>Is there a free trial?</summary><p>Yes — a 7-day free trial is available, with no card required. You can evaluate the whole product before paying.</p></details>
+      <details><summary>How is the licence delivered?</summary><p>Instantly. The licence is digital and activates inside the app the moment your payment is confirmed. Nothing is shipped.</p></details>
+      <details><summary>Will I be charged automatically every month?</summary><p>No. There is no auto-renewal and we do not store your card. Your licence simply expires at the end of the 30 days unless you choose to pay again.</p></details>
+      <details><summary>Who owns my data?</summary><p>You do. Your business data lives on your own computer. On the cloud plans it is also backed up to secure storage, scoped privately to your shop. We never sell your data.</p></details>
+      <details><summary>Can I run more than one outlet?</summary><p>Yes — the Business plan supports multiple counters and multiple outlets under one owner account.</p></details>
+    </div>
   </div>
 </section>
 
-<section id="refund" class="policy">
-  <div class="wrap">
-    <h2>Refund &amp; Cancellation Policy</h2>
-    <ul>
-      <li>A <strong>7-day free trial</strong> is available before any payment, so you can evaluate VERON fully before buying.</li>
-      <li>Because the licence is delivered digitally and activates immediately, <strong>payments are non-refundable</strong> once the licence has been issued.</li>
-      <li><strong>Duplicate or erroneous charges are refunded in full</strong>, within 5–7 working days of being reported to us.</li>
-      <li>There is <strong>no auto-renewal</strong> and no card is stored. Your licence simply expires at the end of the 30 days unless you choose to pay again — so there is nothing to cancel.</li>
-    </ul>
+<!-- POLICIES -->
+<section id="terms">
+  <div class="wrap policy">
+    <div class="shead"><div class="eyebrow">The fine print</div><h2>Policies</h2></div>
+
+    <div class="block">
+      <h3>Terms &amp; Conditions</h3>
+      <p>By purchasing a VERON licence, you agree to the following terms.</p>
+      <h4>The licence</h4>
+      <ul>
+        <li>A VERON licence is valid for 30 days from the date of payment and unlocks the software for one shop.</li>
+        <li>The licence is delivered digitally and activates inside the application immediately after payment. Nothing is shipped.</li>
+        <li>Prices are in Indian Rupees (INR) and are charged per month, per shop.</li>
+        <li>A 7-day free trial is available on each computer, once.</li>
+      </ul>
+      <h4>Acceptable use</h4>
+      <ul>
+        <li>The software is licensed to you for use in your own business. You may not resell, redistribute or reverse-engineer it.</li>
+        <li>You are responsible for the accuracy of the data you enter and for keeping your own backups of your business records.</li>
+      </ul>
+      <h4>Liability</h4>
+      <ul>
+        <li>VERON is provided on an “as-is” basis. We are not liable for business losses arising from misuse, hardware failure, or loss of your own device or data.</li>
+      </ul>
+    </div>
+
+    <div class="block" id="refund">
+      <h3>Refund &amp; Cancellation Policy</h3>
+      <ul>
+        <li>A <strong>7-day free trial</strong> is available before any payment, so you can evaluate VERON fully before buying.</li>
+        <li>Because the licence is delivered digitally and activates immediately, <strong>payments are non-refundable</strong> once the licence has been issued.</li>
+        <li><strong>Duplicate or erroneous charges are refunded in full</strong>, within 5–7 working days of being reported to us.</li>
+        <li>There is <strong>no auto-renewal</strong> and no card is stored. Your licence simply expires at the end of the 30 days — so there is nothing to cancel.</li>
+      </ul>
+    </div>
+
+    <div class="block" id="privacy">
+      <h3>Privacy Policy</h3>
+      <p>We collect only what is needed to provide the software and process your payment.</p>
+      <ul>
+        <li>Account details (name, email, phone) are used to create and support your account.</li>
+        <li>Your business data is stored on your own computer. On paid plans it is also backed up to secure cloud storage, scoped privately to your outlet.</li>
+        <li>Payments are processed by our payment provider. We do not store your card or bank details on our systems.</li>
+        <li>We do not sell your data to anyone.</li>
+      </ul>
+    </div>
   </div>
 </section>
 
-<section id="privacy" class="policy">
-  <div class="wrap">
-    <h2>Privacy Policy</h2>
-    <p>We collect only what is needed to provide the software and process your payment.</p>
-    <ul>
-      <li>Account details (name, email, phone) are used to create and support your account.</li>
-      <li>Your business data (bills, inventory, staff, customers) is stored on your own computer. On paid plans it is also backed up to secure cloud storage, scoped privately to your outlet.</li>
-      <li>Payments are processed by our payment provider. We do not store your card or bank details on our systems.</li>
-      <li>We do not sell your data to anyone.</li>
-    </ul>
-  </div>
-</section>
-
-<section id="contact">
-  <div class="wrap">
-    <h2>Contact Us</h2>
-    <p class="sub">We're happy to help before or after you buy.</p>
+<!-- CONTACT -->
+<section id="contact" style="background:var(--bg2);border-top:1px solid var(--line)">
+  <div class="wrap contact">
+    <div class="eyebrow">We're here to help</div>
+    <h2 style="font-size:clamp(28px,4.5vw,38px);font-weight:800;letter-spacing:-0.8px;margin-top:12px">Get in touch</h2>
     <div class="contact-box">
-      <div><div class="label">Business name</div><div class="value">VERON</div></div>
-      <div><div class="label">Email</div><div class="value"><a href="mailto:verontechapp@gmail.com">verontechapp@gmail.com</a></div></div>
+      <div class="label">Business name</div>
+      <div class="value brand">VERON</div>
+      <div style="height:20px"></div>
+      <div class="label">Email</div>
+      <div class="value"><a href="mailto:verontechapp@gmail.com">verontechapp@gmail.com</a></div>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    © <span id="yr"></span> VERON. All rights reserved. &nbsp;·&nbsp;
-    <a href="#terms">Terms</a> &nbsp;·&nbsp;
-    <a href="#refund">Refunds</a> &nbsp;·&nbsp;
-    <a href="#privacy">Privacy</a>
+    <div class="foot">
+      <div class="brand" style="display:flex;align-items:center;gap:10px"><span class="logo">V</span> VERON</div>
+      <div class="foot-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#terms">Terms</a>
+        <a href="#refund">Refunds</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+    <div class="copy">© <span id="yr"></span> VERON — Point-of-sale software for restaurants &amp; bars. All rights reserved.</div>
   </div>
 </footer>
-<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
-
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
 </body>
 </html>
