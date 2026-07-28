@@ -1,0 +1,24 @@
+# This repo is the public marketing site ONLY. The guards below exist because
+# the application source was once pushed here by accident; they make a repeat
+# accident fail loudly instead of publishing the product.
+lib/
+mobile/
+supabase/
+test/
+tool/
+scripts/
+windows/
+linux/
+macos/
+android/
+ios/
+assets/
+pubspec.yaml
+pubspec.lock
+analysis_options.yaml
+CLAUDE.md
+*.dart
+*.sql
+*.db
+.env
+env.json

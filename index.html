@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VERON — Point-of-Sale Software for Restaurants &amp; Bars</title>
+<meta name="description" content="VERON is offline-first point-of-sale software for restaurants, bars and hotels in India — fast billing, live inventory, staff and customer accounts, with an owner's mobile app that shows your sales live." />
+<meta property="og:title" content="VERON — Point-of-Sale for Restaurants & Bars" />
+<meta property="og:description" content="Fast billing, live inventory, staff and customer accounts. Works fully offline, with an owner's mobile app." />
+<meta property="og:image" content="veron-icon.png" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" type="image/png" href="veron-icon.png" />
+<link rel="apple-touch-icon" href="veron-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0B0B0C; --bg2:#111113; --panel:#161618; --panel2:#1C1C1F;
+    --line:rgba(255,255,255,0.08); --line2:rgba(255,255,255,0.14);
+    --text:#F4F4F5; --muted:#A1A1AA; --faint:#71717A;
+    --accent:#E23B3B; --accent2:#FF6A4D; --violet:#7C6CF6; --ok:#34C759;
+    --r:18px; --maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:radial-gradient(ellipse 1100px 460px at 50% -60px,rgba(226,59,59,.16),transparent 70%) var(--bg);color:var(--text);
+    font-family:"Outfit",-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;position:relative}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent2)}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px;
+    padding:12px 22px;border-radius:12px;transition:box-shadow .25s,background .25s,border-color .25s;
+    cursor:pointer;border:1px solid transparent;position:relative;overflow:hidden;isolation:isolate}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+    box-shadow:0 8px 24px rgba(226,59,59,0.28);animation:btnGlow 2.6s ease-in-out infinite}
+  @keyframes btnGlow{0%,100%{box-shadow:0 8px 24px rgba(226,59,59,.28),0 0 0 rgba(226,59,59,0)}
+    50%{box-shadow:0 8px 26px rgba(226,59,59,.4),0 0 22px 3px rgba(226,59,59,.4)}}
+  /* Hover takes over the glow outright — running the ambient keyframe AND a
+     static hover box-shadow on the same property at once is exactly the
+     transition-fighting-JS bug from the pricing card, replayed on a button. */
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(226,59,59,0.5);animation-play-state:paused}
+  .btn-primary::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;z-index:1;
+    background:linear-gradient(120deg,transparent,rgba(255,255,255,.45),transparent);
+    transform:skewX(-20deg);transition:left .65s ease}
+  .btn-primary:hover::after{left:140%}
+  .btn-ghost{border-color:var(--line2);color:var(--text)}
+  .btn-ghost:hover{background:rgba(255,255,255,0.05);border-color:var(--muted);transform:translateY(-2px)}
+
+  /* Reduced motion: kill everything decorative, keep the site usable */
+  @media (prefers-reduced-motion: reduce){
+    /* animation-delay has to be zeroed alongside the duration: the hero's
+       entrance is a staggered cascade of delays up to .8s, and killing only
+       the durations leaves every delayed element sitting in its `both`
+       fill-mode start state (opacity 0) for that whole time — i.e. a blank
+       hero, which is worse than the animation it was replacing. */
+    *{animation-duration:0.001ms !important;animation-delay:0ms !important;
+      animation-iteration-count:1 !important;transition-duration:0.001ms !important;scroll-behavior:auto !important}
+    .reveal{opacity:1 !important;transform:none !important}
+    .cursor-glow{display:none !important}
+  }
+
+  /* Scroll progress — thin, fixed, driven by a rAF-throttled scroll listener */
+  .scroll-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:2147483001;background:transparent}
+  .scroll-progress-bar{height:100%;width:100%;transform:scaleX(0);transform-origin:0 0;
+    background:linear-gradient(90deg,var(--accent),var(--accent2),var(--violet));will-change:transform}
+
+  /* Click ripple — added/removed by JS on any .btn click */
+  .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.4);
+    transform:scale(0);opacity:.6;animation:rippleAnim .6s ease-out forwards;pointer-events:none}
+  @keyframes rippleAnim{to{transform:scale(1);opacity:0}}
+
+  /* Grain overlay — cheap texture so flat dark panels don't look sterile */
+  .noise{position:fixed;inset:0;z-index:2147483000;pointer-events:none;opacity:.035;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  /* Cursor spotlight — desktop, fine-pointer only (enabled via JS) */
+  .cursor-glow{position:fixed;top:0;left:0;width:440px;height:440px;margin:-220px 0 0 -220px;
+    border-radius:50%;pointer-events:none;z-index:3;opacity:0;transition:opacity .5s;will-change:transform;
+    background:radial-gradient(circle,rgba(226,59,59,0.20),rgba(255,106,77,0.09) 42%,transparent 72%);
+    filter:blur(6px);mix-blend-mode:soft-light}
+
+  /* Scroll reveal */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .75s cubic-bezier(.2,.7,.2,1),transform .75s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .showcase .reveal:nth-child(1){transition-delay:0ms}.showcase .reveal:nth-child(2){transition-delay:70ms}
+  .showcase .reveal:nth-child(3){transition-delay:140ms}.showcase .reveal:nth-child(4){transition-delay:210ms}
+  .showcase .reveal:nth-child(5){transition-delay:280ms}.showcase .reveal:nth-child(6){transition-delay:350ms}
+  .showcase .reveal:nth-child(7){transition-delay:420ms}
+  .steps .reveal:nth-child(1){transition-delay:0ms}.steps .reveal:nth-child(2){transition-delay:110ms}
+  .steps .reveal:nth-child(3){transition-delay:220ms}
+  .plans .reveal:nth-child(1){transition-delay:0ms}.plans .reveal:nth-child(2){transition-delay:100ms}
+  .plans .reveal:nth-child(3){transition-delay:200ms}
+  .faq .reveal:nth-child(1){transition-delay:0ms}.faq .reveal:nth-child(2){transition-delay:60ms}
+  .faq .reveal:nth-child(3){transition-delay:120ms}.faq .reveal:nth-child(4){transition-delay:180ms}
+  .faq .reveal:nth-child(5){transition-delay:240ms}.faq .reveal:nth-child(6){transition-delay:300ms}
+
+  /* Header — floating glass pill, detached from the viewport edge */
+  header{position:sticky;top:14px;z-index:50;padding:0 16px}
+  .nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:64px;
+    padding:0 24px;border-radius:999px;background:transparent;border:none;
+    backdrop-filter:blur(14px) saturate(180%);-webkit-backdrop-filter:blur(14px) saturate(180%);
+    transition:height .35s,transform .35s}
+  header.scrolled .nav{height:56px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-0.4px}
+  .nav-links{display:flex;gap:28px;font-size:14px;color:var(--muted)}
+  .nav-links a{position:relative;padding-bottom:4px;cursor:pointer}
+  .nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1.5px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));transition:right .3s ease}
+  .nav-links a:hover{color:var(--text)}
+  .nav-links a:hover::after{right:0}
+  @media(max-width:760px){.nav-links{display:none}}
+  .logo{width:32px;height:32px;border-radius:50%;display:block;object-fit:cover;
+    box-shadow:0 4px 14px rgba(226,59,59,0.35)}
+  /* Hero — text and the dashboard screenshot only, no decorative blobs/
+     rays/triangles. .hero-bg/.blob/float2/float3 are kept because the
+     "How it works" section below still uses them for its own background. */
+  .hero{position:relative;padding:92px 0 40px}
+  .hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+  /* Hero decoration — two lit triangles per side pointing inward, with one
+     larger dim triangle behind each pair for depth, mirrored left/right.
+     Rounded corners aren't possible on a clip-path polygon (border-radius
+     doesn't apply to clip-path shapes), so these are inline SVG paths with
+     each corner cut and replaced by a quadratic-curve arc instead of a div.
+
+     Geometry, after rotating the box ±90deg about its own centre: the CSS
+     `width` becomes the visible BASE length (vertical), the CSS `height`
+     becomes the apex DEPTH (horizontal), and the apex ends up
+     (width + height)/2 inward from the box's own left/right offset. So the
+     apex x of .tri-a is -10vw + (26+22)/2vw = 14vw from the left edge, and
+     the mirrored one is the same distance from the right. Every value is in
+     vw so the whole arrangement scales as one instead of drifting apart. */
+  .tri{position:absolute;z-index:0;pointer-events:none}
+  .tri-l{transform:rotate(90deg)}
+  .tri-r{transform:rotate(-90deg)}
+  .tri-lit{filter:drop-shadow(0 12px 20px rgba(0,0,0,.55)) drop-shadow(0 0 32px rgba(226,59,59,.45))}
+  .tri-dim{opacity:.65}
+  .tri-a,.tri-b{width:26vw;height:22vw}
+  .tri-a{top:4vw}
+  .tri-b{top:32vw}
+  .tri-back{width:46vw;height:34vw;top:-16vw}
+  .tri-a.tri-l,.tri-b.tri-l{left:-10vw}
+  .tri-a.tri-r,.tri-b.tri-r{right:-10vw}
+  .tri-back.tri-l{left:-22vw}
+  .tri-back.tri-r{right:-22vw}
+  /* Phones: pull the pairs almost off-screen (apex 7vw in, not 14vw) so they
+     stay edge slivers behind full-width centred text rather than sitting
+     under it. */
+  @media(max-width:760px){
+    .tri{opacity:.8}
+    .tri-a,.tri-b{width:44vw;height:30vw}
+    .tri-a{top:8vw}
+    .tri-b{top:58vw}
+    .tri-back{width:74vw;height:46vw;top:-20vw}
+    .tri-a.tri-l,.tri-b.tri-l{left:-26vw}
+    .tri-a.tri-r,.tri-b.tri-r{right:-26vw}
+    .tri-back.tri-l{left:-44vw}
+    .tri-back.tri-r{right:-44vw}
+  }
+  .blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.55;will-change:transform}
+  @keyframes float2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-60px,70px) scale(0.9)}}
+  @keyframes float3{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,-40px)}}
+  .blob-how1{width:340px;height:340px;top:-100px;left:-80px;opacity:.28;
+    background:radial-gradient(circle,var(--accent),transparent 70%);animation:float2 19s ease-in-out infinite}
+  .blob-how2{width:300px;height:300px;bottom:-120px;right:-60px;opacity:.24;
+    background:radial-gradient(circle,var(--violet),transparent 70%);animation:float3 24s ease-in-out infinite}
+  #how .wrap{position:relative;z-index:1}
+
+  .hero-grid{position:relative;z-index:1;text-align:center;max-width:760px;margin:0 auto}
+  .hero h1{font-size:52px;font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin:18px auto 0}
+  .hero h1 .grad{background:linear-gradient(100deg,var(--accent2),var(--accent),#fff,var(--violet),var(--accent2),var(--accent));
+    background-size:280% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:shimmer 7s linear infinite;
+    filter:drop-shadow(0 0 14px rgba(226,59,59,.6)) drop-shadow(0 0 26px rgba(124,108,246,.35)) drop-shadow(0 0 34px rgba(255,106,77,.35))}
+  @keyframes shimmer{to{background-position:280% center}}
+  /* Same neon breathe (and same accent/accent2/white/violet cast) the pricing
+     card's spinning border uses, just on text: the glow pulses independently
+     of the shimmer sweep. */
+  @keyframes neonBreathe{0%,100%{filter:drop-shadow(0 0 10px rgba(226,59,59,.45)) drop-shadow(0 0 20px rgba(124,108,246,.25)) drop-shadow(0 0 26px rgba(255,106,77,.25))}
+    50%{filter:drop-shadow(0 0 18px rgba(226,59,59,.75)) drop-shadow(0 0 32px rgba(124,108,246,.45)) drop-shadow(0 0 42px rgba(255,106,77,.45))}}
+  .hero p.lead{color:var(--muted);font-size:19px;margin:20px auto 0;max-width:520px}
+
+  /* Badge pill above the headline */
+  .hero-badge{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;
+    letter-spacing:.5px;color:var(--text);background:rgba(255,255,255,.045);
+    border:1px solid var(--line2);border-radius:999px;padding:7px 16px 7px 12px;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .hero-badge .hb-dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);flex:none;
+    animation:hbPulse 2.4s ease-in-out infinite}
+  @keyframes hbPulse{0%,100%{box-shadow:0 0 0 4px rgba(226,59,59,.20)}
+    50%{box-shadow:0 0 0 8px rgba(226,59,59,.04)}}
+
+  /* Hero CTA — dark pill ringed in accent, the opposite treatment to the
+     filled .btn-primary gradient used elsewhere. */
+  .btn-hero{margin-top:34px;border-radius:999px;padding:14px 26px;
+    background:rgba(22,11,12,.85);border-color:rgba(226,59,59,.55);color:var(--text);
+    box-shadow:0 0 0 4px rgba(226,59,59,.08),0 10px 30px rgba(226,59,59,.22),
+      inset 0 1px 0 rgba(255,255,255,.06)}
+  .btn-hero:hover{border-color:var(--accent2);
+    box-shadow:0 0 0 5px rgba(226,59,59,.14),0 14px 40px rgba(226,59,59,.38),
+      inset 0 1px 0 rgba(255,255,255,.08)}
+  .btn-hero svg{width:17px;height:17px;transition:transform .3s}
+  .btn-hero:hover svg{transform:translateX(4px)}
+  .hero h1{font-size:clamp(34px,7vw,52px)}
+  .hero h1 .word{display:inline-block;animation:fadeUp .7s cubic-bezier(.2,.8,.2,1) both}
+  /* .grad already has its own infinite shimmer animation — a plain .word rule
+     would silently replace it (the `animation` shorthand doesn't merge
+     between separate rules on the same element), so the word that's also
+     .grad needs both listed explicitly, longhand, each with its own timing. */
+  .hero h1 .grad.word{
+    animation-name:fadeUp,shimmer,neonBreathe;
+    animation-duration:.7s,7s,3.2s;
+    animation-timing-function:cubic-bezier(.2,.8,.2,1),linear,ease-in-out;
+    animation-iteration-count:1,infinite,infinite;
+    animation-fill-mode:both,none,none;
+    animation-delay:.4s,.4s,.4s}
+  .hero .hero-badge,.hero p.lead,.hero .btn-hero{animation:fadeUp .85s cubic-bezier(.2,.8,.2,1) both}
+  .hero .hero-badge{animation-delay:.03s}.hero p.lead{animation-delay:.55s}
+  .hero .btn-hero{animation-delay:.68s}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+
+  /* Hero product shot — the dashboard itself is the proof, so it sits right
+     under the fold, framed like a window rather than a flat screenshot. */
+  .hero-shot-wrap{position:relative;z-index:1;max-width:1260px;margin:56px auto 0;padding:0 24px;
+    animation:fadeUp 1s cubic-bezier(.2,.8,.2,1) both;animation-delay:.8s}
+  .hero-shot{position:relative;border-radius:16px;border:1px solid var(--line2);
+    background:var(--panel);box-shadow:0 30px 90px -20px rgba(0,0,0,0.65),
+    0 0 0 1px rgba(255,255,255,0.04),0 0 120px -40px rgba(226,59,59,0.35);
+    overflow:hidden;animation:shotFloat 7s ease-in-out infinite}
+  @keyframes shotFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .hero-shot img{display:block;width:100%;height:auto}
+  /* Hot filament along the frame's top edge, plus the bloom it throws upward.
+     The line lives inside .hero-shot (clipped to the rounded corners); the
+     bloom has to sit outside it, because .hero-shot is overflow:hidden. */
+  .hero-shot::before{content:"";position:absolute;top:0;left:16%;right:16%;height:3px;z-index:3;
+    background:linear-gradient(90deg,transparent,var(--accent),#FFD9CF 50%,var(--accent),transparent);
+    box-shadow:0 0 12px 2px rgba(255,90,66,.75),0 -4px 22px 4px rgba(226,59,59,.55)}
+  .hero-shot-topglow{position:absolute;left:12%;right:12%;top:-56px;height:120px;z-index:0;
+    background:radial-gradient(ellipse 60% 50% at center bottom,rgba(255,110,80,.85),rgba(226,59,59,.35) 45%,transparent 75%);
+    filter:blur(26px);pointer-events:none}
+  /* Fades the screenshot's own hard bottom edge into the page instead of
+     showing a visible crop line. */
+  .hero-shot::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;
+    background:linear-gradient(to bottom,transparent,var(--bg) 92%);pointer-events:none}
+  .hero-shot-glow{position:absolute;left:6%;right:6%;bottom:-18px;height:60px;z-index:-1;
+    background:radial-gradient(ellipse at center,rgba(226,59,59,0.45),transparent 75%);
+    filter:blur(18px);opacity:.8}
+  /* Phones: the dashboard is a 1915px-wide screenshot, and letting it shrink
+     into ~340px of gutter-inset column turns it into an illegible smear. So
+     it goes full-bleed and zooms to 1.6x instead, cropping the right-hand
+     panels away and keeping the sidebar and KPI tiles actually readable. */
+  @media(max-width:640px){
+    .hero-shot-wrap{margin-top:40px;padding:0}
+    .hero-shot{border-radius:0;border-left:0;border-right:0}
+    .hero-shot img{width:160%;max-width:none}
+    .hero-shot::before{left:8%;right:8%}
+  }
+
+  /* Trust marquee */
+  .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);overflow:hidden}
+  .marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+    mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .marquee-track{display:flex;gap:48px;width:max-content;padding:20px 0;animation:scrollx 30s linear infinite}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  @keyframes scrollx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .trust span{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:14px;font-weight:600;white-space:nowrap}
+  .trust svg{width:17px;height:17px;color:var(--ok);flex:none}
+
+  /* Sections */
+  section{padding:82px 0;position:relative}
+  .shead{text-align:center;max-width:640px;margin:0 auto 52px}
+  .shead h2{font-size:clamp(28px,4.5vw,38px);font-weight:800;letter-spacing:-0.8px;margin:12px 0 0}
+  .shead p{color:var(--muted);font-size:17px;margin-top:14px}
+
+  /* Features — the classic asymmetric bento: a tall hero tile, three
+     stacked cards in the middle column, a tall card + one more on the
+     right. Every card is its own rounded, gapped tile (not edge-to-edge),
+     text anchored consistently bottom-left, pure typography — no icon, no
+     illustration, no external image. Hero is the same coded gradient as
+     every other card, just bigger (spans 2 rows) — not a solid colour. */
+  .showcase{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:190px;gap:16px}
+  .spanel{position:relative;padding:22px;border-radius:20px;border:1px solid var(--line);
+    display:flex;flex-direction:column;justify-content:flex-end;color:#fff;
+    overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s}
+  .spanel:hover{transform:translateY(-4px);border-color:var(--line2);box-shadow:0 20px 46px rgba(0,0,0,.4)}
+  .spanel::before{content:"";position:absolute;inset:0;z-index:0;opacity:.05;mix-blend-mode:overlay;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .spanel > *{position:relative;z-index:2}
+  .spanel.warm{background:
+    radial-gradient(120% 100% at 85% 88%,rgba(226,59,59,.4),transparent 60%),
+    linear-gradient(150deg,#18181a 0%,#1a0e0e 60%,#241111 100%)}
+  .spanel.cool{background:
+    radial-gradient(120% 100% at 85% 88%,rgba(140,140,148,.28),transparent 60%),
+    linear-gradient(150deg,#18181a 0%,#17171a 60%,#232326 100%)}
+  .spanel.hero{grid-column:1;grid-row:1/3}
+  .f-ledger{grid-column:1;grid-row:3}
+  .f-billing{grid-column:2;grid-row:1}
+  .f-kitchen{grid-column:2;grid-row:2}
+  .f-staff{grid-column:2;grid-row:3}
+  .f-mobile{grid-column:3;grid-row:1/3}
+  .f-inventory{grid-column:3;grid-row:3}
+
+  .sbrand{position:absolute;top:16px;right:18px;display:flex;align-items:center;gap:6px;
+    font-size:10px;font-weight:700;letter-spacing:.4px;color:rgba(255,255,255,.8);z-index:3}
+  .sbrand img{width:16px;height:16px;border-radius:50%;display:block}
+
+  .shead-big{font-size:clamp(16px,1.8vw,19px);font-weight:800;line-height:1.15;letter-spacing:-0.3px}
+  .shead-big .num{display:block;font-size:clamp(30px,3.6vw,40px);color:var(--accent2);line-height:.95;margin-bottom:3px}
+  .ssub{font-size:12.5px;color:var(--muted);margin-top:8px;max-width:220px;line-height:1.5}
+  .ssub .hl{background:var(--accent);color:#fff;padding:1px 7px;border-radius:3px;font-weight:700;white-space:nowrap}
+
+  @media(max-width:860px){
+    .showcase{grid-template-columns:1fr;grid-auto-rows:auto}
+    .showcase .spanel{grid-column:1 !important;grid-row:auto !important;min-height:170px}
+  }
+
+  /* Steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:s}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:28px;position:relative;
+    transition:transform .3s,border-color .3s}
+  .step:hover{transform:translateY(-4px);border-color:var(--line2)}
+  .step .num{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,0.05);border:1px solid var(--line2);
+    display:grid;place-items:center;font-weight:800;color:var(--accent2);margin-bottom:16px}
+  .step h3{font-size:17px;margin-bottom:6px}
+  .step p{color:var(--muted);font-size:14.5px}
+
+  /* Pricing */
+  .pricing-wrap{position:relative}
+  .pricing-watermark{position:absolute;top:-34px;left:0;right:0;text-align:center;
+    font-size:clamp(56px,12vw,140px);font-weight:800;letter-spacing:-4px;line-height:1;
+    color:rgba(255,255,255,0.035);pointer-events:none;user-select:none;white-space:nowrap;z-index:0}
+  .pricing-top{position:relative;z-index:1}
+  .pill{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:700;color:var(--text);
+    background:var(--panel);border:1px solid var(--line2);border-radius:20px;padding:7px 16px 7px 8px}
+  .pill .dot{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.06);display:grid;place-items:center;flex:none}
+  .pill svg{width:13px;height:13px;color:var(--accent2)}
+  .pricing-top-row{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:end;margin-top:16px}
+  .ptitle{font-size:clamp(28px,4.5vw,40px);font-weight:800;letter-spacing:-1px;margin-top:14px}
+  .pricing-desc{color:var(--muted);font-size:14.5px;text-align:right;max-width:320px;margin-left:auto}
+  @media(max-width:900px){.pricing-top-row{grid-template-columns:1fr;text-align:center}
+    .pricing-desc{text-align:center;margin:0 auto;max-width:460px}}
+
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch;position:relative;z-index:1}
+  @media(max-width:860px){.plans{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+  .plan{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px;display:flex;flex-direction:column;
+    position:relative;transition:border-color .25s,box-shadow .25s}
+  /* Animated gradient border — background-clip layering, not a rotated
+     pseudo-element: a conic-gradient naturally paints colour across the
+     WHOLE box (it sweeps by angle, not by distance from centre), so
+     anything short of clipping it to just the border-box ring lets it
+     bleed across the card as big colour bands — which a stacked
+     z-index pseudo-element approach failed to contain. This clips for
+     real: the inner layer (padding-box) is opaque and paints only inside
+     the border, the gradient (border-box) is only ever visible in the
+     border's own width. */
+  @property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+  @keyframes spin{to{--angle:360deg}}
+  .plan.featured{border:3px solid transparent;
+    background:
+      linear-gradient(var(--panel),var(--panel)) padding-box,
+      conic-gradient(from var(--angle),var(--accent),var(--accent2),#fff,var(--violet),var(--accent2),var(--accent)) border-box;
+    /* Both animations repaint every tick (a custom-property-driven gradient
+       and box-shadow are never compositor-only) — paused by default so an
+       off-screen card doesn't spend main-thread time nobody can see, and
+       only actually runs while the pricing section is in view. */
+    animation:spin 5s linear infinite,breathe 3.5s ease-in-out infinite;
+    animation-play-state:paused}
+  .plan.featured.animate{animation-play-state:running}
+  /* A tight, even, zero-offset glow hugging the border itself — a neon-tube
+     look — not the big soft drop-shadow this used to be (blur 20-28px with
+     a 14px y-offset), which just diffused into an ambient cloud around the
+     whole card instead of reading as a bright line. */
+  @keyframes breathe{0%,100%{box-shadow:0 0 10px rgba(226,59,59,0.55),0 0 2px rgba(226,59,59,0.4)}
+    50%{box-shadow:0 0 20px rgba(226,59,59,0.75),0 0 4px rgba(226,59,59,0.55)}}
+  .plan-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:20px}
+  .picon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none;
+    background:rgba(255,255,255,0.05);border:1px solid var(--line2);color:var(--muted);
+    transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  .plan:hover .picon{transform:rotate(-8deg) scale(1.08)}
+  .plan.featured .picon{background:linear-gradient(135deg,rgba(226,59,59,0.22),rgba(255,106,77,0.14));
+    border-color:rgba(226,59,59,0.35);color:var(--accent2)}
+  .picon svg{width:22px;height:22px}
+  .plan-top .price{font-size:28px;font-weight:800;letter-spacing:-0.5px;text-align:right;white-space:nowrap}
+  .plan-top .price small{display:block;font-size:11.5px;color:var(--muted);font-weight:600;margin-top:3px;letter-spacing:.2px}
+  .plan .pname{font-size:18px;font-weight:800;letter-spacing:-0.2px}
+  .plan .pdesc{color:var(--muted);font-size:13.5px;margin-top:6px;min-height:40px}
+  .flabel{font-size:13px;font-weight:700;color:var(--text);margin:24px 0 4px}
+  .plan ul{list-style:none}
+  .plan li{color:var(--muted);font-size:14.5px;padding:9px 0 9px 30px;position:relative}
+  .plan li::before{content:"";position:absolute;left:0;top:10px;width:18px;height:18px;border-radius:6px;
+    border:1px solid var(--line2);background-color:rgba(255,255,255,0.03);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23A1A1AA' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:center;background-size:10px}
+  .plan.featured li::before{border-color:rgba(226,59,59,0.4);background-color:rgba(226,59,59,0.08);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF6A4D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E")}
+  .pricenote{text-align:center;color:var(--faint);font-size:13.5px;margin-top:34px;max-width:640px;margin-left:auto;margin-right:auto}
+
+  /* FAQ */
+  .faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+  details{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px 20px;transition:.2s}
+  details[open]{border-color:var(--line2);background:var(--panel2)}
+  summary{cursor:pointer;list-style:none;font-weight:700;font-size:16px;padding:16px 0;
+    display:flex;justify-content:space-between;align-items:center;gap:16px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:22px;color:var(--accent2);font-weight:400;transition:.2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details p{color:var(--muted);font-size:14.5px;padding:0 0 18px}
+
+  /* Policy */
+  .policy{max-width:820px;margin:0 auto}
+  .policy .block{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:30px;margin-bottom:18px;
+    transition:border-color .25s}
+  .policy .block:hover{border-color:var(--line2)}
+  .policy h3{font-size:20px;margin-bottom:14px;letter-spacing:-0.3px}
+  .policy h4{font-size:15px;margin:18px 0 8px;color:var(--text)}
+  .policy p,.policy li{color:var(--muted);font-size:14.5px}
+  .policy ul{margin:8px 0 4px 20px}
+  .policy li{margin-bottom:7px}
+
+  /* Contact */
+  .contact{max-width:560px;margin:0 auto;text-align:center}
+  .contact-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:32px;margin-top:8px;
+    transition:border-color .25s,box-shadow .25s}
+  .contact-box:hover{border-color:var(--line2);box-shadow:0 16px 40px rgba(0,0,0,.35)}
+  .contact-box .label{color:var(--faint);font-size:12px;text-transform:uppercase;letter-spacing:1px}
+  .contact-box .value{font-size:18px;font-weight:700;margin-top:4px}
+  .contact-box a{color:var(--accent2)}
+  /* .brand is display:flex for the nav's logo-plus-wordmark row. Here there is
+     no logo, so flex would pack the name to the left while every other line in
+     the box is centred — hence the explicit centring. */
+  .contact-box .value.brand{font-size:22px;justify-content:center}
+
+  footer{border-top:1px solid var(--line);padding:64px 0 40px;background:var(--bg2)}
+  .foot-grid{display:flex;justify-content:center}
+  .foot-announce{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;
+    max-width:420px;width:100%}
+  .foot-announce .head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .foot-announce .head img{width:28px;height:28px;border-radius:50%}
+  .foot-announce .head .name{font-weight:700;font-size:14px}
+  .foot-announce p{color:var(--muted);font-size:13px;line-height:1.55}
+  .foot-divider{border-top:1px solid var(--line);margin:44px 0 22px}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+  .foot-bottom .brand{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px}
+  .foot-bottom .brand img{border-radius:50%}
+  .foot-social{display:flex;gap:10px}
+  .foot-social a{width:38px;height:38px;border-radius:50%;background:var(--panel);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;color:var(--muted);transition:.2s}
+  .foot-social a svg{width:16px;height:16px}
+  .foot-social a:hover{color:var(--text);border-color:var(--line2);background:var(--panel2)}
+  .copy{color:var(--faint);font-size:12.5px;margin-top:26px}
+</style>
+</head>
+<body>
+
+<div class="noise" aria-hidden="true"></div>
+<div class="cursor-glow" aria-hidden="true"></div>
+<div class="scroll-progress" aria-hidden="true"><div class="scroll-progress-bar"></div></div>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2L22 20H2Z"/></svg>
+    </div>
+    <nav class="nav-links" style="text-transform:uppercase; font-size:11px; letter-spacing:1px; font-weight:600;">
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="#terms">Terms</a>
+      <a href="#privacy">Privacy</a>
+    </nav>
+    <div style="display:flex; justify-content:flex-end;">
+      <div style="width:36px; height:36px; border-radius:50%; border:1px solid var(--line2); display:grid; place-items:center; color:var(--muted);">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <!-- Gradients are defined once here and referenced by id from every
+       triangle below — url(#id) resolves document-wide, so six separate
+       <svg> elements don't need six copies of the same <defs>. The host svg
+       is zero-sized rather than display:none, which would stop some engines
+       from resolving the references at all. -->
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <defs>
+      <linearGradient id="triLit" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FF6A4D"/><stop offset=".55" stop-color="#E23B3B"/><stop offset="1" stop-color="#8E1A1A"/>
+      </linearGradient>
+      <linearGradient id="triDim" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#5E1616"/><stop offset="1" stop-color="#170809"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  <svg class="tri tri-l tri-back tri-dim" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triDim)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
+  <svg class="tri tri-r tri-back tri-dim" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triDim)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
+  <svg class="tri tri-l tri-a tri-lit" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triLit)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
+  <svg class="tri tri-r tri-a tri-lit" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triLit)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
+  <svg class="tri tri-l tri-b tri-lit" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triLit)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
+  <svg class="tri tri-r tri-b tri-lit" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triLit)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="hero-badge" style="padding-left:8px; border-radius:999px; font-weight:400;">
+        <div style="display:flex; margin-right:6px;">
+          <div style="width:20px;height:20px;border-radius:50%;background:#8E1A1A;border:2px solid #1c1c1c;z-index:3;display:grid;place-items:center;font-size:9px;color:white;">C</div>
+          <div style="width:20px;height:20px;border-radius:50%;background:#E23B3B;border:2px solid #1c1c1c;margin-left:-8px;z-index:2;display:grid;place-items:center;font-size:9px;color:white;">E</div>
+          <div style="width:20px;height:20px;border-radius:50%;background:#FF6A4D;border:2px solid #1c1c1c;margin-left:-8px;z-index:1;display:grid;place-items:center;font-size:9px;color:white;">O</div>
+        </div>
+        40+ Positive Reviews
+      </div>
+      <h1 style="font-weight:300; letter-spacing:0; margin-top:24px;">
+        <span style="color:var(--muted); display:block; margin-bottom:12px; font-size:clamp(24px, 4vw, 36px);">STAY IN CONTROL</span>
+        <span style="color:#fff; font-size:clamp(32px, 5.5vw, 48px); font-weight:400;">YOUR PERFORMANCE AT A GLANCE</span>
+      </h1>
+      <p class="lead" style="font-size:15px; max-width:680px;">Unlock next-level performance with AI-powered analytics. Track every view, analyze every download, and gain the competitive edge with real-time insights that turn data into domination.</p>
+      <a class="btn btn-hero" href="#demo" style="padding:12px 24px; font-weight:500;">Book a Free Demo
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-left:6px;"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="hero-shot-wrap">
+    <div class="hero-shot-topglow" aria-hidden="true"></div>
+    <div class="hero-shot">
+      <img src="dashboard-screenshot.png" alt="VERON dashboard — today's sales, bar and kitchen split, net cash in drawer, and a live sales chart" loading="eager">
+    </div>
+    <div class="hero-shot-glow" aria-hidden="true"></div>
+  </div>
+</div>
+
+<!-- TRUST -->
+<div class="trust">
+  <div class="marquee">
+    <div class="marquee-track">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Works fully offline</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Your data stays private</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Licence activates instantly</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> No auto-renewal</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Works fully offline</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Your data stays private</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Licence activates instantly</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> No auto-renewal</span>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="eyebrow">Everything the counter needs</div>
+      <h2>One app for the whole shop</h2>
+      <p>Built for the pace of a real restaurant floor — on the machine you already own.</p>
+    </div>
+    <div class="showcase">
+      <div class="spanel warm hero reveal">
+        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
+        <div class="shead-big"><span class="num">100%</span>Works fully offline</div>
+        <p class="ssub">No internet needed to bill — the cloud is a <span class="hl">backup, never a dependency</span>.</p>
+      </div>
+
+      <div class="spanel warm f-billing reveal">
+        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
+        <div class="shead-big"><span class="num">30s</span>Fast billing</div>
+        <p class="ssub">Split payments, discounts and tax — <span class="hl">built for a busy floor</span>.</p>
+      </div>
+
+      <div class="spanel cool f-kitchen reveal">
+        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
+        <div class="shead-big"><span class="num">Instant</span>Kitchen display</div>
+        <p class="ssub">Every order lands on screen the instant it's placed — <span class="hl">no shouted tickets</span>.</p>
+      </div>
+
+      <div class="spanel warm f-staff reveal">
+        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
+        <div class="shead-big"><span class="num">24/7</span>Staff &amp; attendance</div>
+        <p class="ssub">Attendance, salaries and advances — <span class="hl">one account per staff member</span>.</p>
+      </div>
+
+      <div class="spanel cool f-mobile reveal">
+        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
+        <div class="shead-big"><span class="num">Live</span>Owner's mobile app</div>
+        <p class="ssub">See today's sales, staff and stock live on your phone — <span class="hl">wherever you are</span>.</p>
+      </div>
+
+      <div class="spanel warm f-inventory reveal">
+        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
+        <div class="shead-big"><span class="num">0</span>Live inventory</div>
+        <p class="ssub">Stock counts update as you sell, with alerts before you <span class="hl">run out</span>.</p>
+      </div>
+
+      <div class="spanel warm f-ledger reveal">
+        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
+        <div class="shead-big"><span class="num">₹</span>Customer accounts</div>
+        <p class="ssub">Record udhaar and keep <span class="hl">one clean ledger</span> for every regular.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="blob blob-how1"></div>
+    <div class="blob blob-how2"></div>
+  </div>
+  <div class="wrap">
+    <div class="shead reveal">
+      <div class="eyebrow">Up and running today</div>
+      <h2>Three steps to your first bill</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><div class="num">1</div><h3>Install on your PC</h3><p>Download VERON to your billing computer. No special hardware — it runs on what you have.</p></div>
+      <div class="step reveal"><div class="num">2</div><h3>Set up your shop</h3><p>Add your tables, menu and staff in minutes. Import your items and you're ready to bill.</p></div>
+      <div class="step reveal"><div class="num">3</div><h3>Start selling</h3><p>Ring up orders, take payments, track stock — and watch it all live on your phone.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="wrap pricing-wrap">
+    <div class="pricing-watermark" aria-hidden="true">PRICING</div>
+    <div class="pricing-top reveal">
+      <div class="pill">
+        <span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+        Pricing
+      </div>
+      <div class="pricing-top-row">
+        <div>
+          <h2 class="ptitle">Our pricing plans</h2>
+        </div>
+        <p class="pricing-desc">One licence per shop, per month. No card is stored, and there is no auto-renewal.</p>
+      </div>
+    </div>
+    <div class="plans">
+      <div class="plan reveal">
+        <div class="plan-top">
+          <div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <div class="price">₹999 <small>/ Month</small></div>
+        </div>
+        <div class="pname">Basic</div>
+        <p class="pdesc">Perfect for a single counter that wants full billing without needing the internet.</p>
+        <div class="flabel">Features:</div>
+        <ul>
+          <li>Full point-of-sale billing</li>
+          <li>Inventory, staff &amp; customers</li>
+          <li>Works with no internet</li>
+          <li>All reports on the PC</li>
+        </ul>
+      </div>
+      <div class="plan featured reveal">
+        <div class="plan-top">
+          <div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19a4.5 4.5 0 000-9 6 6 0 00-11.4 2A4 4 0 007 19h10.5z"/></svg></div>
+          <div class="price">₹1,599 <small>/ Month</small></div>
+        </div>
+        <div class="pname">Pro</div>
+        <p class="pdesc">Ideal for owners who want to see sales live and keep a secure cloud backup.</p>
+        <div class="flabel">Features:</div>
+        <ul>
+          <li>Everything in Basic</li>
+          <li>Secure cloud backup</li>
+          <li>Owner's mobile app</li>
+        </ul>
+      </div>
+      <div class="plan reveal">
+        <div class="plan-top">
+          <div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <div class="price">₹2,499 <small>/ Month</small></div>
+        </div>
+        <div class="pname">Max</div>
+        <p class="pdesc">Designed for multi-counter or multi-outlet operations that need it all.</p>
+        <div class="flabel">Features:</div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Waiter ordering app</li>
+          <li>Shared owner &amp; staff phone access</li>
+          <li>Multiple billing counters &amp; outlets</li>
+        </ul>
+      </div>
+    </div>
+    <p class="pricenote">The licence is digital and activates instantly inside the app on payment — nothing is shipped. There is no auto-renewal and no card is stored; your licence simply expires at the end of the month unless you choose to renew.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="shead reveal"><div class="eyebrow">Good to know</div><h2>Frequently asked questions</h2></div>
+    <div class="faq">
+      <details class="reveal"><summary>Does VERON need the internet to work?</summary><p>No. VERON runs fully offline on your computer — you can bill all day with no connection. Internet is only used to back up your data and to power the owner's mobile app on the paid plans.</p></details>
+      <details class="reveal"><summary>Is there a free trial?</summary><p>No — VERON is sold as a monthly licence, with no trial period. If you would like to see the software before buying, get in touch and we will be happy to show you.</p></details>
+      <details class="reveal"><summary>How is the licence delivered?</summary><p>Instantly. The licence is digital and activates inside the app the moment your payment is confirmed. Nothing is shipped.</p></details>
+      <details class="reveal"><summary>Will I be charged automatically every month?</summary><p>No. There is no auto-renewal and we do not store your card. Your licence simply expires at the end of the 30 days unless you choose to pay again.</p></details>
+      <details class="reveal"><summary>Who owns my data?</summary><p>You do. Your business data lives on your own computer. On the cloud plans it is also backed up to secure storage, scoped privately to your shop. We never sell your data.</p></details>
+      <details class="reveal"><summary>Can I run more than one outlet?</summary><p>Yes — the Max plan supports multiple counters and multiple outlets under one owner account.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- POLICIES -->
+<section id="terms">
+  <div class="wrap policy">
+    <div class="shead reveal"><div class="eyebrow">The fine print</div><h2>Policies</h2></div>
+
+    <div class="block reveal">
+      <h3>Terms &amp; Conditions</h3>
+      <p>By purchasing a VERON licence, you agree to the following terms.</p>
+      <h4>The licence</h4>
+      <ul>
+        <li>A VERON licence is valid for 30 days from the date of payment and unlocks the software for one shop.</li>
+        <li>The licence is delivered digitally and activates inside the application immediately after payment. Nothing is shipped.</li>
+        <li>Prices are in Indian Rupees (INR) and are charged per month, per shop.</li>
+      </ul>
+      <h4>Acceptable use</h4>
+      <ul>
+        <li>The software is licensed to you for use in your own business. You may not resell, redistribute or reverse-engineer it.</li>
+        <li>You are responsible for the accuracy of the data you enter and for keeping your own backups of your business records.</li>
+      </ul>
+      <h4>Liability</h4>
+      <ul>
+        <li>VERON is provided on an “as-is” basis. We are not liable for business losses arising from misuse, hardware failure, or loss of your own device or data.</li>
+      </ul>
+    </div>
+
+    <div class="block reveal" id="refund">
+      <h3>Refund &amp; Cancellation Policy</h3>
+      <ul>
+        <li>Because the licence is delivered digitally and activates immediately, <strong>payments are non-refundable</strong> once the licence has been issued.</li>
+        <li><strong>Duplicate or erroneous charges are refunded in full</strong>, within 5–7 working days of being reported to us.</li>
+        <li>There is <strong>no auto-renewal</strong> and no card is stored. Your licence simply expires at the end of the 30 days — so there is nothing to cancel.</li>
+      </ul>
+    </div>
+
+    <div class="block reveal" id="privacy">
+      <h3>Privacy Policy</h3>
+      <p>We collect only what is needed to provide the software and process your payment.</p>
+      <ul>
+        <li>Account details (name, email, phone) are used to create and support your account.</li>
+        <li>Your business data is stored on your own computer. On paid plans it is also backed up to secure cloud storage, scoped privately to your outlet.</li>
+        <li>Payments are processed by our payment provider. We do not store your card or bank details on our systems.</li>
+        <li>We do not sell your data to anyone.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" style="background:var(--bg2);border-top:1px solid var(--line)">
+  <div class="wrap contact">
+    <div class="eyebrow">We're here to help</div>
+    <h2 style="font-size:clamp(28px,4.5vw,38px);font-weight:800;letter-spacing:-0.8px;margin-top:12px">Get in touch</h2>
+    <div class="contact-box reveal">
+      <div class="label">Business name</div>
+      <div class="value brand">VERON</div>
+      <div style="height:16px"></div>
+      <div class="label">Email</div>
+      <div class="value"><a href="mailto:verontechapp@gmail.com">verontechapp@gmail.com</a></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-announce">
+        <div class="head">
+          <img src="veron-icon.png" alt="" />
+          <div class="name">VERON</div>
+        </div>
+        <p>Owners now carry the shop in their pocket — live sales, staff and stock, the moment anything changes.</p>
+      </div>
+    </div>
+    <div class="foot-divider"></div>
+    <div class="foot-bottom">
+      <div class="brand"><img class="logo" src="veron-icon.png" width="26" height="26" alt="" /> VERON, <span class="yr"></span>.</div>
+      <div class="foot-social">
+        <a href="mailto:verontechapp@gmail.com" aria-label="Email us" title="Email us">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="copy">© <span class="yr"></span> VERON — Point-of-sale software for restaurants &amp; bars. All rights reserved.<br />
+    VERON is a sole proprietorship owned and operated by Aditya Namdeo Bhoye, registered under Udyam Registration No. UDYAM-MH-23-0418290.</div>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.yr').forEach(function(el){el.textContent=new Date().getFullYear()});
+
+// Nav links scroll to their section but never touch the URL — no #fragment
+// ever lands in the address bar, so a click never reads as "navigating
+// somewhere." Same effect as a real anchor, minus the history entry.
+document.querySelectorAll('.nav-links a[href^="#"], .btn-hero[href^="#"]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    var target = document.getElementById(a.getAttribute('href').slice(1));
+    if(!target) return;
+    var headerEl = document.querySelector('header');
+    var offset = (headerEl ? headerEl.offsetHeight : 0) + 24;
+    var y = target.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({top:y, behavior:'smooth'});
+  });
+});
+
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+// One scroll listener driving both the header state and the progress bar,
+// coalesced through rAF so a fast trackpad fling never queues more than one
+// style write per frame.
+var header = document.querySelector('header');
+var progressBar = document.querySelector('.scroll-progress-bar');
+var scrollTicking = false;
+function onScrollFrame(){
+  var y = window.scrollY;
+  header.classList.toggle('scrolled', y > 10);
+  var max = document.documentElement.scrollHeight - window.innerHeight;
+  var pct = max > 0 ? Math.min(1, y / max) : 0;
+  progressBar.style.transform = 'scaleX(' + pct + ')';
+  scrollTicking = false;
+}
+window.addEventListener('scroll', function(){
+  if (!scrollTicking) { scrollTicking = true; requestAnimationFrame(onScrollFrame); }
+}, {passive:true});
+onScrollFrame();
+
+// Cursor spotlight — desktop only, off for touch/reduced-motion.
+if (!reduceMotion && finePointer) {
+  var glow = document.querySelector('.cursor-glow');
+  var mx = window.innerWidth/2, my = window.innerHeight/2, gx = mx, gy = my;
+  window.addEventListener('mousemove', function(e){ mx = e.clientX; my = e.clientY; }, {passive:true});
+  (function loop(){
+    gx += (mx-gx)*0.12; gy += (my-gy)*0.12;
+    glow.style.transform = 'translate3d('+gx+'px,'+gy+'px,0)';
+    requestAnimationFrame(loop);
+  })();
+  glow.style.opacity = 1;
+}
+
+// Scroll reveal.
+var revealEls = document.querySelectorAll('.reveal');
+if (reduceMotion || !('IntersectionObserver' in window)) {
+  revealEls.forEach(function(el){ el.classList.add('in'); });
+} else {
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) { entry.target.classList.add('in'); io.unobserve(entry.target); }
+    });
+  }, {threshold:0.15});
+  revealEls.forEach(function(el){ io.observe(el); });
+}
+
+// The featured plan's spin+breathe only run while it's actually on screen —
+// unlike the reveal observer above, this one keeps watching (no unobserve)
+// so scrolling back down pauses it again.
+var featuredPlan = document.querySelector('.plan.featured');
+if (featuredPlan) {
+  if (reduceMotion || !('IntersectionObserver' in window)) {
+    featuredPlan.classList.add('animate');
+  } else {
+    new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        featuredPlan.classList.toggle('animate', entry.isIntersecting);
+      });
+    }, {threshold:0.1}).observe(featuredPlan);
+  }
+}
+
+// Shared drag between "track the cursor" and "snap back smoothly": while
+// the pointer is moving, transform updates are rAF-coalesced (one write per
+// frame, not one per raw mousemove — those can fire far faster than the
+// screen repaints) AND the element's own transition is turned off, so it
+// tracks the cursor 1:1 instead of a CSS transition perpetually chasing a
+// target that's already stale by the next frame — that chase is what read
+// as "laggy". The transition comes back only for the release, so leaving
+// still eases to neutral instead of snapping.
+function attachPointerFollow(el, compute, releaseTransition){
+  var queued = false, lastX = 0, lastY = 0;
+  el.addEventListener('mousemove', function(e){
+    el.style.transition = 'none';
+    lastX = e.clientX; lastY = e.clientY;
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function(){
+      el.style.transform = compute(el, lastX, lastY);
+      queued = false;
+    });
+  }, {passive:true});
+  el.addEventListener('mouseleave', function(){
+    el.style.transition = releaseTransition;
+    el.style.transform = '';
+  });
+}
+
+// Magnetic pull — primary buttons drift toward the cursor while hovered.
+if (!reduceMotion && finePointer) {
+  document.querySelectorAll('.btn-primary').forEach(function(btn){
+    attachPointerFollow(btn, function(el, x, y){
+      var r = el.getBoundingClientRect();
+      var mx = x - (r.left + r.width/2), my = y - (r.top + r.height/2);
+      return 'translate('+(mx*0.18)+'px,'+(my*0.3)+'px)';
+    }, 'transform .3s cubic-bezier(.2,.8,.2,1)');
+  });
+}
+
+// Click ripple — any button-shaped element, expanding from the exact
+// pointer position, self-removing once its animation ends.
+document.querySelectorAll('.btn').forEach(function(btn){
+  btn.addEventListener('click', function(e){
+    var r = btn.getBoundingClientRect();
+    var size = Math.max(r.width, r.height) * 2;
+    var ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - r.left - size/2) + 'px';
+    ripple.style.top = (e.clientY - r.top - size/2) + 'px';
+    btn.appendChild(ripple);
+    ripple.addEventListener('animationend', function(){ ripple.remove(); });
+  });
+});
+</script>
+</body>
+</html>
