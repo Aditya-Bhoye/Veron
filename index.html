@@ -10,7 +10,10 @@
 <meta property="og:image" content="veron-icon.png" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
-<link rel="icon" type="image/png" href="veron-icon.png" />
+<!-- SVG favicon clips the square source art to a circle, so the tab icon is
+     round like the logo everywhere else. PNG stays as the fallback. -->
+<link rel="icon" type="image/svg+xml" href="veron-favicon.svg" />
+<link rel="alternate icon" type="image/png" href="veron-icon.png" />
 <link rel="apple-touch-icon" href="veron-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,7 +33,6 @@
     line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;position:relative}
-  .eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent2)}
   .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px;
     padding:12px 22px;border-radius:12px;transition:box-shadow .25s,background .25s,border-color .25s;
     cursor:pointer;border:1px solid transparent;position:relative;overflow:hidden;isolation:isolate}
@@ -99,19 +101,51 @@
 
   /* Header — floating glass pill, detached from the viewport edge */
   header{position:sticky;top:14px;z-index:50;padding:0 16px}
-  .nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:64px;
+  .nav{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:64px;
     padding:0 24px;border-radius:999px;background:transparent;border:none;
     backdrop-filter:blur(14px) saturate(180%);-webkit-backdrop-filter:blur(14px) saturate(180%);
     transition:height .35s,transform .35s}
   header.scrolled .nav{height:56px}
+  /* justify-self:start keeps the wordmark pinned left — the nav is a
+     1fr auto 1fr grid, so without it the brand centres in its own column. */
   .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-0.4px}
-  .nav-links{display:flex;gap:28px;font-size:14px;color:var(--muted)}
+  .nav .brand{justify-self:start;color:var(--text);transition:opacity .2s}
+  .nav .brand:hover{opacity:.8}
+  .nav .brand img{border-radius:50%;display:block;flex:none}
+  .nav-links{display:flex;align-items:center;gap:28px;font-size:14px;color:var(--muted)}
   .nav-links a{position:relative;padding-bottom:4px;cursor:pointer}
   .nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1.5px;
     background:linear-gradient(90deg,var(--accent),var(--accent2));transition:right .3s ease}
   .nav-links a:hover{color:var(--text)}
   .nav-links a:hover::after{right:0}
-  @media(max-width:760px){.nav-links{display:none}}
+  /* Mobile nav. The links used to just display:none under 760px, which left
+     phones with no navigation at all — now they collapse into a dropdown
+     under a toggle. The panel is absolutely positioned against .nav, so it
+     hangs below the pill without changing its height. */
+  .nav-toggle{display:none;justify-self:end;width:40px;height:40px;border-radius:12px;
+    background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--text);
+    cursor:pointer;place-items:center;padding:0}
+  .nav-toggle svg{width:19px;height:19px}
+  .nav-toggle .ic-close{display:none}
+  .nav.open .nav-toggle .ic-close{display:block}
+  .nav.open .nav-toggle .ic-open{display:none}
+  @media(max-width:760px){
+    /* .nav-links goes position:absolute below, which takes it out of grid
+       flow — with the 1fr/auto/1fr track list the toggle would then fall into
+       the centre column. Two tracks puts it back on the right edge. */
+    .nav{grid-template-columns:1fr auto;padding:0 16px}
+    header{padding:0 12px}
+    .nav-toggle{display:grid}
+    .nav-links{position:absolute;top:calc(100% + 10px);left:0;right:0;z-index:60;
+      display:none;flex-direction:column;align-items:stretch;gap:2px;
+      background:rgba(13,13,15,.97);border:1px solid var(--line2);border-radius:18px;padding:8px;
+      backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      box-shadow:0 28px 60px rgba(0,0,0,.65)}
+    .nav.open .nav-links{display:flex}
+    .nav-links a{padding:13px 14px;border-radius:12px;font-size:12px;color:var(--text)}
+    .nav-links a::after{display:none}
+    .nav-links a:active,.nav-links a:hover{background:rgba(255,255,255,.07)}
+  }
   .logo{width:32px;height:32px;border-radius:50%;display:block;object-fit:cover;
     box-shadow:0 4px 14px rgba(226,59,59,0.35)}
   /* Hero — text and the dashboard screenshot only, no decorative blobs/
@@ -258,21 +292,42 @@
     .hero-shot::before{left:8%;right:8%}
   }
 
-  /* Trust marquee */
-  .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);overflow:hidden}
-  .marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
-    mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
-  .marquee-track{display:flex;gap:48px;width:max-content;padding:20px 0;animation:scrollx 30s linear infinite}
-  .marquee:hover .marquee-track{animation-play-state:paused}
-  @keyframes scrollx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-  .trust span{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:14px;font-weight:600;white-space:nowrap}
-  .trust svg{width:17px;height:17px;color:var(--ok);flex:none}
-
   /* Sections */
   section{padding:82px 0;position:relative}
-  .shead{text-align:center;max-width:640px;margin:0 auto 52px}
-  .shead h2{font-size:clamp(28px,4.5vw,38px);font-weight:800;letter-spacing:-0.8px;margin:12px 0 0}
-  .shead p{color:var(--muted);font-size:17px;margin-top:14px}
+  /* Section heads mirror the hero's .new-h1/.new-p exactly — light weight,
+     white, -1px tracking, 1.15 leading — just a step smaller. */
+  .shead{text-align:center;max-width:720px;margin:0 auto 52px}
+  .shead h2{font-size:clamp(28px,4.2vw,46px);font-weight:400;color:#fff;
+    letter-spacing:-1px;line-height:1.15;margin:0}
+  .shead p{color:#a1a1aa;font-size:16px;line-height:1.6;max-width:660px;margin:24px auto 0}
+
+  /* Every section carries the hero's palette: a warm bloom and a violet
+     bloom layered over its base colour. Which one leads alternates down the
+     page, so the two base colours (--bg / --bg2) still read as distinct bands
+     without introducing a third. Declared here rather than inline so the
+     whole scheme retunes from one place. #features takes no rule lines — the
+     hero's gradient leaks into its top and #how draws its own border. */
+  #features{background:
+    radial-gradient(ellipse 900px 400px at 50% 8%,rgba(226,59,59,.13),transparent 68%),
+    radial-gradient(ellipse 760px 380px at 50% 100%,rgba(124,108,246,.09),transparent 70%),
+    var(--bg)}
+  #how{overflow:hidden;background:
+    radial-gradient(ellipse 840px 380px at 50% 0,rgba(124,108,246,.14),transparent 70%),
+    radial-gradient(ellipse 900px 400px at 50% 100%,rgba(255,106,77,.10),transparent 70%),
+    var(--bg2);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  #pricing{background:
+    radial-gradient(ellipse 950px 420px at 50% 6%,rgba(255,106,77,.12),transparent 68%),
+    radial-gradient(ellipse 820px 400px at 50% 100%,rgba(124,108,246,.10),transparent 70%),
+    var(--bg)}
+  #faq{background:
+    radial-gradient(ellipse 840px 360px at 50% 0,rgba(124,108,246,.12),transparent 70%),
+    radial-gradient(ellipse 880px 380px at 50% 100%,rgba(226,59,59,.09),transparent 70%),
+    var(--bg2);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  #terms{background:
+    radial-gradient(ellipse 900px 380px at 50% 4%,rgba(226,59,59,.08),transparent 70%),
+    var(--bg)}
 
   /* Features — the classic asymmetric bento: a tall hero tile, three
      stacked cards in the middle column, a tall card + one more on the
@@ -281,19 +336,37 @@
      illustration, no external image. Hero is the same coded gradient as
      every other card, just bigger (spans 2 rows) — not a solid colour. */
   .showcase{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:190px;gap:16px}
+  /* Carved-in look: light catches the top inner edge, the walls shade inward,
+     and a thin lit lip under the bottom border lifts the card off the page. */
   .spanel{position:relative;padding:22px;border-radius:20px;border:1px solid var(--line);
     display:flex;flex-direction:column;justify-content:flex-end;color:#fff;
-    overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s}
-  .spanel:hover{transform:translateY(-4px);border-color:var(--line2);box-shadow:0 20px 46px rgba(0,0,0,.4)}
-  .spanel::before{content:"";position:absolute;inset:0;z-index:0;opacity:.05;mix-blend-mode:overlay;pointer-events:none;
+    overflow:hidden;transition:transform .3s,box-shadow .3s;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
+      inset 0 20px 30px -24px rgba(0,0,0,.5),
+      inset 0 -18px 28px -24px rgba(0,0,0,.45),
+      inset 14px 0 26px -28px rgba(0,0,0,.4),
+      inset -14px 0 26px -28px rgba(0,0,0,.4),
+      0 4px 10px rgba(0,0,0,.45),
+      0 20px 44px rgba(0,0,0,.6)}
+  .spanel:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
+      inset 0 20px 30px -24px rgba(0,0,0,.5),
+      inset 0 -18px 28px -24px rgba(0,0,0,.45),
+      inset 14px 0 26px -28px rgba(0,0,0,.4),
+      inset -14px 0 26px -28px rgba(0,0,0,.4),
+      0 8px 18px rgba(0,0,0,.5),
+      0 32px 64px rgba(0,0,0,.7)}
+  .spanel::before,.step::before{content:"";position:absolute;inset:0;z-index:0;opacity:.05;mix-blend-mode:overlay;pointer-events:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-  .spanel > *{position:relative;z-index:2}
-  .spanel.warm{background:
-    radial-gradient(120% 100% at 85% 88%,rgba(226,59,59,.4),transparent 60%),
-    linear-gradient(150deg,#18181a 0%,#1a0e0e 60%,#241111 100%)}
-  .spanel.cool{background:
-    radial-gradient(120% 100% at 85% 88%,rgba(140,140,148,.28),transparent 60%),
-    linear-gradient(150deg,#18181a 0%,#17171a 60%,#232326 100%)}
+  .spanel > *,.step > *{position:relative;z-index:2}
+  /* Warm tiles take the hero's orange rather than the old red, cool tiles
+     take the palette's violet rather than a neutral grey — so the bento
+     reads as the same two-colour scheme as the hero and pricing rim. */
+  .spanel.warm,.step.warm{background:
+    radial-gradient(120% 100% at 85% 88%,rgba(255,106,77,.4),transparent 60%),
+    linear-gradient(150deg,#18181a 0%,#1c120e 60%,#2a1710 100%)}
+  .spanel.cool,.step.cool{background:
+    radial-gradient(120% 100% at 85% 88%,rgba(124,108,246,.3),transparent 60%),
+    linear-gradient(150deg,#18181a 0%,#17161d 60%,#211f2e 100%)}
   .spanel.hero{grid-column:1;grid-row:1/3}
   .f-ledger{grid-column:1;grid-row:3}
   .f-billing{grid-column:2;grid-row:1}
@@ -306,8 +379,30 @@
     font-size:10px;font-weight:700;letter-spacing:.4px;color:rgba(255,255,255,.8);z-index:3}
   .sbrand img{width:16px;height:16px;border-radius:50%;display:block}
 
-  .shead-big{font-size:clamp(16px,1.8vw,19px);font-weight:800;line-height:1.15;letter-spacing:-0.3px}
+  /* --carve is the recess colour: a deep tint of the card's own hue, never
+     black, so the shading stays in family with the tile it's cut into. */
+  .shead-big{font-size:clamp(16px,1.8vw,19px);font-weight:800;line-height:1.15;letter-spacing:-0.3px;
+    --carve:rgba(92,34,13,.9);--carve-soft:rgba(92,34,13,.5);
+    text-shadow:-1px -1px 0 var(--carve),1px 1px 0 rgba(255,255,255,.10)}
+  .cool .shead-big{--carve:rgba(38,30,110,.9);--carve-soft:rgba(38,30,110,.5)}
   .shead-big .num{display:block;font-size:clamp(30px,3.6vw,40px);color:var(--accent2);line-height:.95;margin-bottom:3px}
+  /* Carved numerals, lit from the lower right at 155deg rather than straight
+     down: the fill runs from a deep tint of the card's hue at the top-left of
+     each glyph to a hot highlight at the bottom-right, with the cast shadow
+     offset up-left and the lit lip down-right to match that one light source.
+     Gated on background-clip:text — the transparent fill would erase the
+     number outright without it. */
+  @supports ((-webkit-background-clip:text) or (background-clip:text)){
+    .shead-big .num{
+      background:linear-gradient(155deg,#7a3116 0%,#ad4c23 26%,var(--accent2) 62%,#ff9d78 100%);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      text-shadow:none;
+      filter:drop-shadow(-1px -1px 0 var(--carve))
+             drop-shadow(1px 1px 0 rgba(255,255,255,.13))}
+    .cool .shead-big .num{
+      background:linear-gradient(155deg,#332c8a 0%,#4f45bd 26%,var(--violet) 62%,#a99fff 100%);
+      -webkit-background-clip:text;background-clip:text}
+  }
   .ssub{font-size:12.5px;color:var(--muted);margin-top:8px;max-width:220px;line-height:1.5}
   .ssub .hl{background:var(--accent);color:#fff;padding:1px 7px;border-radius:3px;font-weight:700;white-space:nowrap}
 
@@ -318,14 +413,28 @@
 
   /* Steps */
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:s}
-  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  @media(max-width:900px){.steps{grid-template-columns:1fr}}
   .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:28px;position:relative;
-    transition:transform .3s,border-color .3s}
-  .step:hover{transform:translateY(-4px);border-color:var(--line2)}
-  .step .num{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,0.05);border:1px solid var(--line2);
-    display:grid;place-items:center;font-weight:800;color:var(--accent2);margin-bottom:16px}
-  .step h3{font-size:17px;margin-bottom:6px}
-  .step p{color:var(--muted);font-size:14.5px}
+    min-height:320px;display:flex;flex-direction:column;justify-content:flex-end;
+    transition:transform .3s,box-shadow .3s;overflow:hidden;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),
+      inset 0 18px 28px -22px rgba(0,0,0,.48),
+      inset 0 -16px 26px -22px rgba(0,0,0,.42),
+      inset 12px 0 24px -26px rgba(0,0,0,.38),
+      inset -12px 0 24px -26px rgba(0,0,0,.38),
+      0 4px 10px rgba(0,0,0,.4),
+      0 18px 40px rgba(0,0,0,.55)}
+  .step:hover{transform:translateY(-4px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),
+      inset 0 18px 28px -22px rgba(0,0,0,.48),
+      inset 0 -16px 26px -22px rgba(0,0,0,.42),
+      inset 12px 0 24px -26px rgba(0,0,0,.38),
+      inset -12px 0 24px -26px rgba(0,0,0,.38),
+      0 8px 18px rgba(0,0,0,.45),
+      0 30px 60px rgba(0,0,0,.65)}
+  /* Steps borrow the bento cards' .shead-big/.ssub type outright — the only
+     change is letting the copy fill the column instead of a bento tile. */
+  .step .ssub{max-width:none}
 
   /* Pricing */
   .pricing-wrap{position:relative}
@@ -420,37 +529,60 @@
   .policy ul{margin:8px 0 4px 20px}
   .policy li{margin-bottom:7px}
 
-  /* Contact */
-  .contact{max-width:560px;margin:0 auto;text-align:center}
-  .contact-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:32px;margin-top:8px;
-    transition:border-color .25s,box-shadow .25s}
-  .contact-box:hover{border-color:var(--line2);box-shadow:0 16px 40px rgba(0,0,0,.35)}
-  .contact-box .label{color:var(--faint);font-size:12px;text-transform:uppercase;letter-spacing:1px}
-  .contact-box .value{font-size:18px;font-weight:700;margin-top:4px}
-  .contact-box a{color:var(--accent2)}
-  /* .brand is display:flex for the nav's logo-plus-wordmark row. Here there is
-     no logo, so flex would pack the name to the left while every other line in
-     the box is centred — hence the explicit centring. */
-  .contact-box .value.brand{font-size:22px;justify-content:center}
+  /* Footer is its own rounded panel, not a full-bleed band — it floats on the
+     page background with the giant wordmark bleeding off its bottom edge. */
+  footer{padding:0 0 40px;background:transparent;border:0}
+  .foot-panel{position:relative;overflow:hidden;border-radius:26px;background:#0e0e10;
+    border:1px solid var(--line);padding:56px 52px 0}
+  .foot-top{display:grid;grid-template-columns:minmax(0,1.35fr) repeat(4,minmax(0,1fr));gap:32px}
+  .foot-about .name{font-size:26px;font-weight:800;letter-spacing:-0.6px;color:#fff}
+  .foot-about p{margin-top:14px;color:var(--muted);font-size:13.5px;line-height:1.6;max-width:270px}
+  .foot-col h4{font-size:14.5px;font-weight:600;color:#fff;margin-bottom:16px}
+  .foot-col ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+  .foot-col a{color:var(--muted);font-size:13.5px;transition:color .2s}
+  .foot-col a:hover{color:#fff}
+  .foot-rule{border-top:1px solid var(--line);margin:44px 0 20px}
+  .foot-meta{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    color:var(--faint);font-size:12.5px}
+  .foot-meta a{color:var(--faint)}
+  .foot-meta a:hover{color:var(--muted)}
+  /* The oversized wordmark: clipped by the panel so its lower half is cut
+     off, and filled with a gradient that peaks in the centre — bright in the
+     middle, falling into the panel colour at both edges. */
+  .foot-word{margin-top:26px;text-align:center;line-height:.78;font-weight:800;letter-spacing:-4px;
+    font-size:clamp(64px,15.5vw,220px);user-select:none;
+    background:linear-gradient(96deg,#1c1c1f 0%,var(--accent) 32%,var(--accent2) 50%,var(--accent) 68%,#1c1c1f 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  @media(max-width:900px){
+    .foot-panel{padding:40px 26px 0;border-radius:20px}
+    .foot-top{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+    .foot-about{grid-column:1/-1}
+  }
 
-  footer{border-top:1px solid var(--line);padding:64px 0 40px;background:var(--bg2)}
-  .foot-grid{display:flex;justify-content:center}
-  .foot-announce{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;
-    max-width:420px;width:100%}
-  .foot-announce .head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  .foot-announce .head img{width:28px;height:28px;border-radius:50%}
-  .foot-announce .head .name{font-weight:700;font-size:14px}
-  .foot-announce p{color:var(--muted);font-size:13px;line-height:1.55}
-  .foot-divider{border-top:1px solid var(--line);margin:44px 0 22px}
-  .foot-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-  .foot-bottom .brand{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px}
-  .foot-bottom .brand img{border-radius:50%}
-  .foot-social{display:flex;gap:10px}
-  .foot-social a{width:38px;height:38px;border-radius:50%;background:var(--panel);border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;color:var(--muted);transition:.2s}
-  .foot-social a svg{width:16px;height:16px}
-  .foot-social a:hover{color:var(--text);border-color:var(--line2);background:var(--panel2)}
-  .copy{color:var(--faint);font-size:12.5px;margin-top:26px}
+  /* Legal + FAQ live in native <dialog>s opened from the footer, so the long
+     copy is reachable without occupying the scroll. Using <dialog> rather
+     than a hand-rolled overlay buys the backdrop, ESC-to-close, focus
+     trapping and inertness of the page behind it for free. */
+  .modal{width:min(760px,calc(100vw - 36px));max-height:min(82vh,820px);padding:0;
+    border:1px solid var(--line2);border-radius:20px;background:var(--panel);color:var(--text);
+    overflow:hidden;box-shadow:0 40px 90px -20px rgba(0,0,0,.8)}
+  .modal::backdrop{background:rgba(4,4,5,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .modal[open]{animation:modalIn .22s cubic-bezier(.2,.8,.2,1)}
+  @keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:20px 22px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .modal-head h3{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+  .modal-x{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;
+    background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--muted);
+    cursor:pointer;transition:.2s}
+  .modal-x svg{width:16px;height:16px}
+  .modal-x:hover{color:#fff;background:rgba(255,255,255,.13);border-color:var(--line2)}
+  .modal-body{padding:22px;overflow-y:auto;max-height:calc(82vh - 76px)}
+  /* Inside a dialog the blocks are already framed by the dialog itself. */
+  .modal-body .policy{max-width:none}
+  .modal-body .policy .block{background:none;border:0;border-radius:0;padding:0;margin-bottom:26px}
+  .modal-body .policy .block:last-child{margin-bottom:0}
+  .modal-body .faq{max-width:none}
 </style>
 </head>
 <body>
@@ -461,87 +593,404 @@
 
 <header>
   <div class="wrap nav">
-    <div class="brand">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2L22 20H2Z"/></svg>
-    </div>
-    <nav class="nav-links" style="text-transform:uppercase; font-size:11px; letter-spacing:1px; font-weight:600;">
+    <a class="brand" href="#" aria-label="VERON home">
+      <img src="veron-icon.png" width="28" height="28" alt="" />
+      VERON
+    </a>
+    <nav id="nav-links" class="nav-links" style="text-transform:uppercase; font-size:11px; letter-spacing:1px; font-weight:600;">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
       <a href="#pricing">Pricing</a>
-      <a href="#faq">FAQ</a>
-      <a href="#terms">Terms</a>
-      <a href="#privacy">Privacy</a>
+      <a href="#download">Download</a>
     </nav>
-    <div style="display:flex; justify-content:flex-end;">
-      <div style="width:36px; height:36px; border-radius:50%; border:1px solid var(--line2); display:grid; place-items:center; color:var(--muted);">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </div>
-    </div>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">
+      <svg class="ic-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <svg class="ic-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
   </div>
 </header>
 
-<!-- HERO -->
-<div class="hero">
-  <!-- Gradients are defined once here and referenced by id from every
-       triangle below — url(#id) resolves document-wide, so six separate
-       <svg> elements don't need six copies of the same <defs>. The host svg
-       is zero-sized rather than display:none, which would stop some engines
-       from resolving the references at all. -->
-  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
-    <defs>
-      <linearGradient id="triLit" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#FF6A4D"/><stop offset=".55" stop-color="#E23B3B"/><stop offset="1" stop-color="#8E1A1A"/>
-      </linearGradient>
-      <linearGradient id="triDim" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#5E1616"/><stop offset="1" stop-color="#170809"/>
-      </linearGradient>
-    </defs>
-  </svg>
-  <svg class="tri tri-l tri-back tri-dim" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triDim)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
-  <svg class="tri tri-r tri-back tri-dim" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triDim)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
-  <svg class="tri tri-l tri-a tri-lit" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triLit)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
-  <svg class="tri tri-r tri-a tri-lit" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triLit)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
-  <svg class="tri tri-l tri-b tri-lit" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triLit)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
-  <svg class="tri tri-r tri-b tri-lit" aria-hidden="true" viewBox="0 0 100 86.6" preserveAspectRatio="none"><path fill="url(#triLit)" d="M57,12.1 L93,74.5 Q100,86.6 86,86.6 L14,86.6 Q0,86.6 7,74.5 L43,12.1 Q50,0 57,12.1 Z"/></svg>
-  <div class="wrap hero-grid">
-    <div>
-      <div class="hero-badge" style="padding-left:8px; border-radius:999px; font-weight:400;">
-        <div style="display:flex; margin-right:6px;">
-          <div style="width:20px;height:20px;border-radius:50%;background:#8E1A1A;border:2px solid #1c1c1c;z-index:3;display:grid;place-items:center;font-size:9px;color:white;">C</div>
-          <div style="width:20px;height:20px;border-radius:50%;background:#E23B3B;border:2px solid #1c1c1c;margin-left:-8px;z-index:2;display:grid;place-items:center;font-size:9px;color:white;">E</div>
-          <div style="width:20px;height:20px;border-radius:50%;background:#FF6A4D;border:2px solid #1c1c1c;margin-left:-8px;z-index:1;display:grid;place-items:center;font-size:9px;color:white;">O</div>
-        </div>
-        40+ Positive Reviews
-      </div>
-      <h1 style="font-weight:300; letter-spacing:0; margin-top:24px;">
-        <span style="color:var(--muted); display:block; margin-bottom:12px; font-size:clamp(24px, 4vw, 36px);">STAY IN CONTROL</span>
-        <span style="color:#fff; font-size:clamp(32px, 5.5vw, 48px); font-weight:400;">YOUR PERFORMANCE AT A GLANCE</span>
-      </h1>
-      <p class="lead" style="font-size:15px; max-width:680px;">Unlock next-level performance with AI-powered analytics. Track every view, analyze every download, and gain the competitive edge with real-time insights that turn data into domination.</p>
-      <a class="btn btn-hero" href="#demo" style="padding:12px 24px; font-weight:500;">Book a Free Demo
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-left:6px;"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </a>
-    </div>
-  </div>
-  <div class="hero-shot-wrap">
-    <div class="hero-shot-topglow" aria-hidden="true"></div>
-    <div class="hero-shot">
-      <img src="dashboard-screenshot.png" alt="VERON dashboard — today's sales, bar and kitchen split, net cash in drawer, and a live sales chart" loading="eager">
-    </div>
-    <div class="hero-shot-glow" aria-hidden="true"></div>
-  </div>
-</div>
+<!-- HERO (Redesigned) -->
+<style id="new-hero-styles">
+  .new-hero-section {
+    position: relative;
+    margin-top: -100px;
+    padding: 120px 24px 0;
+    text-align: center;
+    overflow: hidden;
+    border-radius: 32px;
+    background: linear-gradient(to bottom, #030303 0%, #030303 50%, rgba(255, 106, 77, 0.6) 100%);
+  }
+  /* Same spinning conic edge as the featured pricing card — the identical
+     six-stop gradient, violet included — reusing its --angle property and
+     spin keyframes. Opaque padding-box fill under a gradient confined to
+     border-box, so colour only ever shows in the rim itself. Paused off-screen:
+     a custom-property gradient repaints on the main thread every tick, and
+     these are big. The outer pair sits back on opacity alone, which keeps
+     the hues exactly equal to the inner pair's. --edge-offset enters each
+     shape at its own phase of the shared sweep, so the four rims never show
+     the same colour in the same place. */
+  .hero-shape {
+    position: absolute;
+    top: -40px;
+    width: 600px;
+    height: 600px;
+    --edge-offset: 0deg;
+    border: 3px solid transparent;
+    background:
+      linear-gradient(#060606, #060606) padding-box,
+      conic-gradient(from calc(var(--angle) + var(--edge-offset)),var(--accent),var(--accent2),#fff,var(--violet),var(--accent2),var(--accent)) border-box;
+    border-radius: 60px;
+    z-index: 0;
+    pointer-events: none;
+    animation: spin 6s linear infinite;
+    animation-play-state: paused;
+  }
+  .hero-shape.animate { animation-play-state: running; }
+  .hero-shape-left {
+    --edge-offset: 0deg;
+    left: -450px;
+    transform: rotate(45deg);
+    box-shadow: 40px -40px 150px -20px rgba(255, 106, 77, 0.25), inset -3px 3px 20px rgba(255, 130, 88, 0.4);
+    z-index: 1;
+  }
+  .hero-shape-left-outer {
+    --edge-offset: 90deg;
+    opacity: 0.55;
+    left: -450px;
+    top: 140px;
+    transform: rotate(45deg);
+    box-shadow: 40px -40px 150px -20px rgba(255, 106, 77, 0.15), inset -3px 3px 20px rgba(255, 130, 88, 0.2);
+    z-index: 0;
+  }
+  .hero-shape-right {
+    --edge-offset: 180deg;
+    right: -450px;
+    transform: rotate(45deg);
+    box-shadow: -40px 40px 150px -20px rgba(255, 106, 77, 0.25), inset 3px -3px 20px rgba(255, 130, 88, 0.4);
+    z-index: 1;
+  }
+  .hero-shape-right-outer {
+    --edge-offset: 270deg;
+    opacity: 0.55;
+    right: -450px;
+    top: 140px;
+    transform: rotate(45deg);
+    box-shadow: -40px 40px 150px -20px rgba(255, 106, 77, 0.15), inset 3px -3px 20px rgba(255, 130, 88, 0.2);
+    z-index: 0;
+  }
 
-<!-- TRUST -->
-<div class="trust">
-  <div class="marquee">
-    <div class="marquee-track">
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Works fully offline</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Your data stays private</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Licence activates instantly</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> No auto-renewal</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Works fully offline</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Your data stays private</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Licence activates instantly</span>
-      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> No auto-renewal</span>
+  .new-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .new-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 16px 4px 6px;
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+    color: #ddd;
+    font-size: 13px;
+    backdrop-filter: blur(10px);
+  }
+  .new-badge-avatars {
+    display: flex;
+  }
+  .new-badge-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #141414;
+    margin-left: -8px;
+    background-size: cover;
+    background-position: center;
+    display: grid;
+    place-items: center;
+    font-size: 10px;
+    color: #fff;
+    font-weight: bold;
+  }
+  .new-badge-avatar:first-child { margin-left: 0; }
+  .nba-1 { background-color: #594a5a; }
+  .nba-2 { background-color: #7b4f59; }
+  .nba-3 { background-color: #9c5555; }
+
+  .new-h1 {
+    font-weight: 300;
+    font-size: clamp(32px, 5vw, 54px);
+    margin-top: 32px;
+    line-height: 1.15;
+  }
+  .new-h1 .line1 {
+    display: block;
+    color: #999;
+    font-size: 0.6em;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+  .new-h1 .line2 {
+    display: block;
+    color: #ffffff;
+    font-weight: 400;
+    letter-spacing: -1px;
+  }
+
+  .new-p {
+    color: #a1a1aa;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 660px;
+    margin: 24px auto 0;
+  }
+
+  /* Same spinning conic rim as the hero shapes, on its own phase. */
+  .new-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 36px;
+    padding: 12px 24px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 2px solid transparent;
+    background:
+      linear-gradient(#000, #000) padding-box,
+      conic-gradient(from calc(var(--angle) + 135deg),var(--accent),var(--accent2),#fff,var(--violet),var(--accent2),var(--accent)) border-box;
+    box-shadow: 0 0 24px rgba(226, 59, 59, 0.45), 0 0 44px rgba(124, 108, 246, 0.22),
+      inset 0 0 12px rgba(226, 59, 59, 0.28);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: spin 6s linear infinite;
+    animation-play-state: paused;
+  }
+  .new-btn.animate { animation-play-state: running; }
+  .new-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 34px rgba(226, 59, 59, 0.65), 0 0 60px rgba(124, 108, 246, 0.35),
+      inset 0 0 16px rgba(226, 59, 59, 0.4);
+  }
+
+  .new-shot-wrap {
+    position: relative;
+    max-width: 1040px;
+    margin: 40px auto 0;
+    z-index: 2;
+  }
+  .new-shot-topglow {
+    position: absolute;
+    top: -1px;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent,
+      var(--accent), var(--accent2), #fff, var(--violet), var(--accent2), var(--accent),
+      transparent);
+    box-shadow: 0 0 40px 10px rgba(255,106,77,0.4), 0 0 60px 16px rgba(124,108,246,0.22);
+    z-index: 3;
+  }
+  .new-shot {
+    border-radius: 16px 16px 0 0;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-bottom: none;
+    background: #0a0a0a;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 120px -20px rgba(255,106,77,0.25), 0 0 160px -30px rgba(124,108,246,0.2);
+  }
+  .new-shot img {
+    width: 100%;
+    display: block;
+  }
+
+  /* Hero on small screens. The decorative shapes are a fixed 600px square
+     pinned 450px off each edge — at phone widths that reads as a wall rather
+     than a corner accent, so they scale down with the viewport and their
+     offsets scale with them. Nothing here changes the desktop layout. */
+  @media (max-width: 900px) {
+    .new-hero-section { margin-top: -80px; padding: 96px 18px 0; border-radius: 24px; }
+    .hero-shape { width: 380px; height: 380px; border-radius: 42px; border-width: 2px; }
+    .hero-shape-left, .hero-shape-left-outer { left: -280px; }
+    .hero-shape-right, .hero-shape-right-outer { right: -280px; }
+    .hero-shape-left-outer, .hero-shape-right-outer { top: 95px; }
+    .new-shot-wrap { margin-top: 32px; }
+  }
+  @media (max-width: 560px) {
+    .new-hero-section { margin-top: -68px; padding: 84px 14px 0; border-radius: 18px; }
+    .hero-shape { width: 250px; height: 250px; border-radius: 28px; }
+    .hero-shape-left, .hero-shape-left-outer { left: -185px; }
+    .hero-shape-right, .hero-shape-right-outer { right: -185px; }
+    .hero-shape-left-outer, .hero-shape-right-outer { top: 62px; }
+    .new-h1 { margin-top: 22px; }
+    .new-p { font-size: 14.5px; margin-top: 18px; }
+    .new-btn { margin-top: 26px; padding: 11px 20px; font-size: 14px; }
+    .new-shot-wrap { margin-top: 26px; }
+    .new-shot { border-radius: 12px 12px 0 0; }
+    .new-shot-topglow { left: 8%; right: 8%; }
+  }
+
+  /* Closing CTA. Copy sits left; the right half is a decorative circuit of
+     dashed traces with product tiles on the junctions — pure SVG + CSS, and
+     aria-hidden since it says nothing the copy doesn't.
+
+     The panel is a dark base with the orange concentrated in a bloom across
+     the top, NOT a straight orange-to-black ramp: ramping the full height
+     drags the midsection through muddy browns, which is what made this look
+     dirty. Keeping the warmth as light over a near-black base means the
+     orange stays saturated and the body stays clean. */
+  .cta-wrap{max-width:1560px}
+  .cta-panel{position:relative;overflow:hidden;width:100%;border-radius:28px;
+    padding:76px 72px;
+    background:
+      radial-gradient(120% 78% at 50% -8%,rgba(255,140,92,.85) 0%,rgba(226,59,59,.42) 38%,transparent 74%),
+      radial-gradient(60% 50% at 88% 6%,rgba(255,170,120,.3) 0%,transparent 70%),
+      linear-gradient(180deg,#241009 0%,#160c0b 46%,#0d0a0b 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.14),
+      inset 0 -26px 40px -30px rgba(0,0,0,.55),
+      inset 34px 0 70px -46px rgba(20,10,8,.6),
+      inset -34px 0 70px -46px rgba(20,10,8,.6),
+      0 -1px 0 rgba(255,255,255,.06)}
+  .cta-inner{position:relative;z-index:2;
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.85fr);gap:32px;align-items:center}
+  .cta-panel::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(120% 105% at 50% 12%,transparent 55%,rgba(8,5,6,.5) 100%)}
+  .cta-copy{position:relative;z-index:2}
+  .cta-h{font-size:clamp(30px,4.4vw,50px);line-height:1.08;letter-spacing:-1.4px;font-weight:400;color:#fff}
+  /* Second line sits back, the way the reference sets its subordinate clause. */
+  .cta-h span{display:block;color:rgba(255,255,255,.6)}
+  .cta-p{margin-top:18px;max-width:430px;font-size:15.5px;line-height:1.6;color:rgba(255,255,255,.82)}
+  /* Four store buttons on a 2x2 so they stay legible beside the circuit
+     instead of squeezing into one row. */
+  .cta-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:30px;max-width:440px}
+  /* Glass rather than the near-black they used to be — the panel body is now
+     dark, so a black pill on it disappears. */
+  .cta-btn{display:inline-flex;align-items:center;gap:11px;padding:11px 18px;border-radius:12px;
+    background:rgba(255,255,255,.075);color:#fff;font-weight:600;font-size:14.5px;
+    border:1px solid rgba(255,255,255,.18);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    transition:transform .2s,box-shadow .2s,background .2s,border-color .2s}
+  .cta-btn svg{width:22px;height:22px;flex:none}
+  .cta-btn small{display:block;font-size:10.5px;font-weight:500;letter-spacing:.3px;
+    color:rgba(255,255,255,.6);line-height:1.1}
+  .cta-btn strong{display:block;font-size:14.5px;font-weight:700;line-height:1.2}
+  .cta-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.14);
+    border-color:rgba(255,255,255,.32);box-shadow:0 12px 26px rgba(0,0,0,.45)}
+
+  .cta-circuit{position:relative;min-height:280px;z-index:2}
+  .cta-circuit svg.traces{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .cta-circuit svg.traces path{fill:none;stroke-linecap:round}
+  /* The dashes crawl along each trace; -22 is exactly two 5+6 periods, so the
+     loop is seamless. Staggered so the traces don't march in lockstep. */
+  .trace-base{filter:drop-shadow(0 2px 3px rgba(28,8,2,.8)) drop-shadow(0 0 6px rgba(255,180,150,.3))}
+  .trace-base path{stroke:rgba(255,255,255,.42);stroke-width:1.5;stroke-dasharray:5 6;
+    animation:traceFlow 1.8s linear infinite}
+  .trace-base path:nth-child(2){animation-delay:-.5s}
+  .trace-base path:nth-child(3){animation-delay:-.9s}
+  .trace-base path:nth-child(4){animation-delay:-1.3s}
+  .trace-base path:nth-child(5){animation-delay:-.2s}
+  .trace-base path:nth-child(6){animation-delay:-1.6s}
+  @keyframes traceFlow{to{stroke-dashoffset:-22px}}
+  /* A bright packet running the length of each trace. pathLength normalises
+     every path to 100 units, so one dash pattern and one keyframe cover all
+     six regardless of their real lengths. */
+  .trace-pulse path{stroke:#fff;stroke-width:2;stroke-dasharray:10 90;
+    filter:drop-shadow(0 2px 3px rgba(28,8,2,.75)) drop-shadow(0 0 7px rgba(255,255,255,.9));
+    animation:tracePulse 3.2s linear infinite}
+  .trace-pulse path:nth-child(2){animation-delay:.5s}
+  .trace-pulse path:nth-child(3){animation-delay:1.1s}
+  .trace-pulse path:nth-child(4){animation-delay:1.7s}
+  .trace-pulse path:nth-child(5){animation-delay:2.3s}
+  .trace-pulse path:nth-child(6){animation-delay:2.8s}
+  @keyframes tracePulse{from{stroke-dashoffset:100}to{stroke-dashoffset:-10}}
+  /* translate(-50%,-50%) makes left/top the tile's centre, so a tile at
+     left:45%;top:12% sits exactly on viewBox point (0.45*400, 0.12*300) =
+     (180,36). preserveAspectRatio="none" stretches the viewBox to fill the
+     box on both axes, which keeps that mapping exactly linear — that's what
+     lets every trace terminate dead-centre under its tile. */
+  .ctile{position:absolute;transform:translate(-50%,-50%);display:grid;place-items:center;border-radius:14px;color:#fff;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:0 10px 24px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.3)}
+  .ctile svg{width:20px;height:20px}
+  .ctile.sm{width:44px;height:44px}
+  .ctile.md{width:56px;height:56px}
+  /* One tile breaks the warm scheme in violet, and one reads as a lit
+     white chip — the same two focal points the reference uses. */
+  .ctile.violet{background:linear-gradient(150deg,#7C6CF6,#4f43c9);border-color:rgba(255,255,255,.35);
+    box-shadow:0 12px 30px rgba(60,45,190,.5),inset 0 1px 0 rgba(255,255,255,.4)}
+  .ctile.light{background:#fff;color:#111;border-color:rgba(255,255,255,.9);
+    box-shadow:0 12px 28px rgba(0,0,0,.3)}
+  .ctile.hot{background:linear-gradient(150deg,#ffd0bd,#ff8a5f);color:#7a2c14;
+    border-color:rgba(255,255,255,.5);box-shadow:0 12px 30px rgba(255,120,80,.5)}
+  .t1{left:45%;top:12%}   /* vb 180,36  */
+  .t2{left:12%;top:34%}   /* vb  48,102 */
+  .t3{left:62%;top:28%}   /* vb 248,84  */
+  .t4{left:34%;top:62%}   /* vb 136,186 */
+  .t5{left:78%;top:74%}   /* vb 312,222 */
+  .t6{left:90%;top:38%}   /* vb 360,114 */
+
+  @media(max-width:900px){
+    .cta-inner{grid-template-columns:1fr}
+    .cta-panel{padding:44px 26px;border-radius:22px}
+    .cta-circuit{display:none}
+    .cta-p{max-width:none}
+  }
+  @media(max-width:560px){
+    .cta-panel{padding:36px 20px;border-radius:18px}
+    .cta-h{letter-spacing:-.8px}
+    .cta-actions{gap:10px;margin-top:24px}
+    .cta-btn{padding:11px 14px}
+  }
+  @media(max-width:460px){.cta-actions{grid-template-columns:1fr;max-width:none}}
+
+  /* Global small-screen trims: sections and the footer both carry desktop-
+     scale padding that eats most of a phone viewport. Tap targets in the
+     footer link columns get real height rather than relying on line-height. */
+  @media(max-width:640px){
+    section{padding:56px 0}
+    .wrap{padding:0 18px}
+    .shead{margin-bottom:36px}
+    .foot-panel{padding:34px 20px 0}
+    .foot-top{grid-template-columns:1fr;gap:26px}
+    .foot-col ul{gap:4px}
+    .foot-col a{display:inline-block;padding:6px 0}
+    .foot-meta{flex-direction:column;align-items:flex-start;gap:6px}
+    .modal{width:calc(100vw - 20px);max-height:88vh}
+    .modal-body{padding:18px;max-height:calc(88vh - 72px)}
+    .modal-head{padding:16px 18px}
+  }
+</style>
+
+<div class="new-hero-section">
+  <div class="hero-shape hero-shape-left-outer"></div>
+  <div class="hero-shape hero-shape-left"></div>
+  <div class="hero-shape hero-shape-right-outer"></div>
+  <div class="hero-shape hero-shape-right"></div>
+  
+  <div class="new-hero-content">
+    <h1 class="new-h1">
+      <span class="line2">BILLING TO INVENTORY, LIVE ON YOUR SCREEN</span>
+    </h1>
+
+    <p class="new-p">VERON is point-of-sale software built for the pace of restaurants and bars. Fast billing, live inventory tracking, staff management, customer accounts — everything works fully offline on your own computer, with a mobile app to watch your sales live.</p>
+    
+    <a href="#pricing" class="new-btn">Download
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+
+  <div class="new-shot-wrap">
+    <div class="new-shot-topglow"></div>
+    <div class="new-shot">
+      <img src="dashboard-screenshot.png" alt="VERON dashboard">
     </div>
   </div>
 </div>
@@ -550,7 +999,6 @@
 <section id="features">
   <div class="wrap">
     <div class="shead reveal">
-      <div class="eyebrow">Everything the counter needs</div>
       <h2>One app for the whole shop</h2>
       <p>Built for the pace of a real restaurant floor — on the machine you already own.</p>
     </div>
@@ -579,19 +1027,19 @@
         <p class="ssub">Attendance, salaries and advances — <span class="hl">one account per staff member</span>.</p>
       </div>
 
-      <div class="spanel cool f-mobile reveal">
+      <div class="spanel warm f-mobile reveal">
         <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
         <div class="shead-big"><span class="num">Live</span>Owner's mobile app</div>
         <p class="ssub">See today's sales, staff and stock live on your phone — <span class="hl">wherever you are</span>.</p>
       </div>
 
-      <div class="spanel warm f-inventory reveal">
+      <div class="spanel cool f-inventory reveal">
         <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
-        <div class="shead-big"><span class="num">0</span>Live inventory</div>
+        <div class="shead-big">Live inventory</div>
         <p class="ssub">Stock counts update as you sell, with alerts before you <span class="hl">run out</span>.</p>
       </div>
 
-      <div class="spanel warm f-ledger reveal">
+      <div class="spanel cool f-ledger reveal">
         <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
         <div class="shead-big"><span class="num">₹</span>Customer accounts</div>
         <p class="ssub">Record udhaar and keep <span class="hl">one clean ledger</span> for every regular.</p>
@@ -601,20 +1049,20 @@
 </section>
 
 <!-- HOW -->
-<section id="how" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden">
+<section id="how">
   <div class="hero-bg" aria-hidden="true">
     <div class="blob blob-how1"></div>
     <div class="blob blob-how2"></div>
   </div>
   <div class="wrap">
     <div class="shead reveal">
-      <div class="eyebrow">Up and running today</div>
       <h2>Three steps to your first bill</h2>
+      <p>No installers to chase, no technician visit, no waiting on approval — you can be taking money by the end of the day.</p>
     </div>
     <div class="steps">
-      <div class="step reveal"><div class="num">1</div><h3>Install on your PC</h3><p>Download VERON to your billing computer. No special hardware — it runs on what you have.</p></div>
-      <div class="step reveal"><div class="num">2</div><h3>Set up your shop</h3><p>Add your tables, menu and staff in minutes. Import your items and you're ready to bill.</p></div>
-      <div class="step reveal"><div class="num">3</div><h3>Start selling</h3><p>Ring up orders, take payments, track stock — and watch it all live on your phone.</p></div>
+      <div class="step warm reveal"><h3 class="shead-big"><span class="num">10 min</span>Install on your PC</h3><p class="ssub">Download VERON straight to the billing computer already sitting at your counter. There is no server to configure and <span class="hl">no special hardware to buy</span> — if it runs Windows, it runs VERON, and you are billing the same afternoon.</p></div>
+      <div class="step cool reveal"><h3 class="shead-big"><span class="num">Once</span>Set up your shop</h3><p class="ssub">Add your tables, menu, rates and staff in a single sitting. Import your item list, set taxes and discounts one time, and <span class="hl">every bill after that is a tap</span> — you never re-enter the same thing twice.</p></div>
+      <div class="step warm reveal"><h3 class="shead-big"><span class="num">Day 1</span>Start selling</h3><p class="ssub">Ring up orders, split payments, print receipts and track stock from one screen your team picks up in an afternoon. Every bill writes to your own machine first, so the day's sales and inventory stay <span class="hl">live on your phone wherever you are</span>.</p></div>
     </div>
   </div>
 </section>
@@ -685,27 +1133,159 @@
   </div>
 </section>
 
-<!-- FAQ -->
-<section id="faq" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
-  <div class="wrap">
-    <div class="shead reveal"><div class="eyebrow">Good to know</div><h2>Frequently asked questions</h2></div>
-    <div class="faq">
-      <details class="reveal"><summary>Does VERON need the internet to work?</summary><p>No. VERON runs fully offline on your computer — you can bill all day with no connection. Internet is only used to back up your data and to power the owner's mobile app on the paid plans.</p></details>
-      <details class="reveal"><summary>Is there a free trial?</summary><p>No — VERON is sold as a monthly licence, with no trial period. If you would like to see the software before buying, get in touch and we will be happy to show you.</p></details>
-      <details class="reveal"><summary>How is the licence delivered?</summary><p>Instantly. The licence is digital and activates inside the app the moment your payment is confirmed. Nothing is shipped.</p></details>
-      <details class="reveal"><summary>Will I be charged automatically every month?</summary><p>No. There is no auto-renewal and we do not store your card. Your licence simply expires at the end of the 30 days unless you choose to pay again.</p></details>
-      <details class="reveal"><summary>Who owns my data?</summary><p>You do. Your business data lives on your own computer. On the cloud plans it is also backed up to secure storage, scoped privately to your shop. We never sell your data.</p></details>
-      <details class="reveal"><summary>Can I run more than one outlet?</summary><p>Yes — the Max plan supports multiple counters and multiple outlets under one owner account.</p></details>
+<!-- CLOSING CTA -->
+<div class="wrap cta-wrap" style="padding-bottom:82px">
+  <section id="download" class="cta-panel reveal">
+    <div class="cta-inner">
+    <div class="cta-copy">
+      <h2 class="cta-h">Run the floor.<span>Not the paperwork</span></h2>
+      <p class="cta-p">Join the restaurants and bars billing on VERON every night. Set it up on the computer you already own and start taking orders today — no hardware to buy, no internet required.</p>
+      <div class="cta-actions">
+        <a href="#pricing" class="cta-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.6l7.3-1v7.1H3V5.6zm8.4-1.2L21 3v8.7h-9.6V4.4zM3 12.8h7.3v7.1l-7.3-1v-6.1zm8.4 0H21V21l-9.6-1.3v-6.9z"/></svg>
+          <span><small>Download for</small><strong>Windows</strong></span>
+        </a>
+        <a href="#pricing" class="cta-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 1.4c0 1.1-.5 2.2-1.2 3-.8.8-2.2 1.5-3.3 1.4-.1-1.1.4-2.3 1.2-3 .8-.8 2.2-1.4 3.3-1.4zM20.9 17.1c-.5 1.3-.8 1.8-1.5 3-1 1.5-2.4 3.5-4.1 3.5-1.5 0-1.9-1-4-1s-2.5 1-4 1c-1.8 0-3.1-1.8-4.1-3.3C.4 16.9.1 11.7 1.9 9c1.3-1.9 3.3-3 5.2-3 2 0 3.2 1.1 4.8 1.1 1.6 0 2.5-1.1 4.8-1.1 1.7 0 3.5.9 4.8 2.5-4.2 2.3-3.6 8.3.4 8.6z"/></svg>
+          <span><small>Download for</small><strong>macOS</strong></span>
+        </a>
+        <a href="#pricing" class="cta-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 9h12v9.2c0 .6-.5 1.1-1.1 1.1h-1.3v2.6c0 .6-.5 1.1-1.1 1.1s-1.1-.5-1.1-1.1v-2.6h-2.8v2.6c0 .6-.5 1.1-1.1 1.1s-1.1-.5-1.1-1.1v-2.6H7.1c-.6 0-1.1-.5-1.1-1.1V9zm-2.2 0c.7 0 1.2.5 1.2 1.1v5c0 .6-.5 1.1-1.2 1.1s-1.1-.5-1.1-1.1v-5c0-.6.5-1.1 1.1-1.1zm16.4 0c.6 0 1.1.5 1.1 1.1v5c0 .6-.5 1.1-1.1 1.1s-1.2-.5-1.2-1.1v-5c0-.6.5-1.1 1.2-1.1zM7.5 8c.1-1.6 1-3 2.4-3.8l-.9-1.6a.3.3 0 0 1 .5-.3l1 1.7a5.9 5.9 0 0 1 3 0l1-1.7a.3.3 0 0 1 .5.3l-.9 1.6A4.9 4.9 0 0 1 16.5 8h-9zm2.4-2.2a.6.6 0 1 0 0 1.2.6.6 0 0 0 0-1.2zm4.2 0a.6.6 0 1 0 0 1.2.6.6 0 0 0 0-1.2z"/></svg>
+          <span><small>Download for</small><strong>Android</strong></span>
+        </a>
+        <a href="#pricing" class="cta-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 1.4c0 1.1-.5 2.2-1.2 3-.8.8-2.2 1.5-3.3 1.4-.1-1.1.4-2.3 1.2-3 .8-.8 2.2-1.4 3.3-1.4zM20.9 17.1c-.5 1.3-.8 1.8-1.5 3-1 1.5-2.4 3.5-4.1 3.5-1.5 0-1.9-1-4-1s-2.5 1-4 1c-1.8 0-3.1-1.8-4.1-3.3C.4 16.9.1 11.7 1.9 9c1.3-1.9 3.3-3 5.2-3 2 0 3.2 1.1 4.8 1.1 1.6 0 2.5-1.1 4.8-1.1 1.7 0 3.5.9 4.8 2.5-4.2 2.3-3.6 8.3.4 8.6z"/></svg>
+          <span><small>Download for</small><strong>iOS</strong></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="cta-circuit" aria-hidden="true">
+      <svg class="traces" viewBox="0 0 400 300" preserveAspectRatio="none">
+        <g class="trace-base">
+          <path d="M180 36 L180 70 L48 70 L48 102" />
+          <path d="M180 36 L248 36 L248 84" />
+          <path d="M48 102 L48 186 L136 186" />
+          <path d="M248 84 L248 114 L360 114" />
+          <path d="M136 186 L136 222 L312 222" />
+          <path d="M360 114 L360 178 L312 178 L312 222" />
+        </g>
+        <g class="trace-pulse">
+          <path pathLength="100" d="M180 36 L180 70 L48 70 L48 102" />
+          <path pathLength="100" d="M180 36 L248 36 L248 84" />
+          <path pathLength="100" d="M48 102 L48 186 L136 186" />
+          <path pathLength="100" d="M248 84 L248 114 L360 114" />
+          <path pathLength="100" d="M136 186 L136 222 L312 222" />
+          <path pathLength="100" d="M360 114 L360 178 L312 178 L312 222" />
+        </g>
+      </svg>
+      <div class="ctile sm t1 hot" title="Billing">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h16v18l-3-2-2 2-3-2-3 2-2-2-3 2z"/><path d="M8 8h8M8 12h8"/></svg>
+      </div>
+      <div class="ctile sm t2" title="Tables">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 18v3M17 18v3"/></svg>
+      </div>
+      <div class="ctile md t3 violet" title="Kitchen display">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <div class="ctile sm t4" title="Inventory">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="ctile sm t5" title="Staff">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="ctile sm t6 light" title="Owner's mobile app">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>
+      </div>
+    </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap cta-wrap">
+    <div class="foot-panel">
+      <div class="foot-top">
+        <div class="foot-about">
+          <div class="name">VERON</div>
+          <p>Point-of-sale software for restaurants and bars — fast billing, live stock and staff, running fully offline on the computer you already own.</p>
+        </div>
+
+        <div class="foot-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how">How it works</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#" data-modal="m-faq">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="foot-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="mailto:verontechapp@gmail.com">Contact</a></li>
+            <li><a href="mailto:verontechapp@gmail.com">Support</a></li>
+            <li><a href="#pricing">Book a demo</a></li>
+          </ul>
+        </div>
+
+        <div class="foot-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#" data-modal="m-terms">Terms &amp; conditions</a></li>
+            <li><a href="#" data-modal="m-privacy">Privacy policy</a></li>
+            <li><a href="#" data-modal="m-refund">Refund policy</a></li>
+          </ul>
+        </div>
+
+        <div class="foot-col">
+          <h4>Download</h4>
+          <ul>
+            <li><a href="#pricing">Windows</a></li>
+            <li><a href="#pricing">macOS</a></li>
+            <li><a href="#pricing">Android</a></li>
+            <li><a href="#pricing">iOS</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="foot-rule"></div>
+      <div class="foot-meta">
+        <div>© <span class="yr"></span> VERON. All rights reserved.</div>
+        <div><a href="mailto:verontechapp@gmail.com">verontechapp@gmail.com</a></div>
+      </div>
+
+      <div class="foot-word" aria-hidden="true">VERON</div>
     </div>
   </div>
-</section>
+</footer>
 
-<!-- POLICIES -->
-<section id="terms">
-  <div class="wrap policy">
-    <div class="shead reveal"><div class="eyebrow">The fine print</div><h2>Policies</h2></div>
+<!-- LEGAL + FAQ DIALOGS -->
+<dialog class="modal" id="m-faq">
+  <div class="modal-head">
+    <h3>Frequently asked questions</h3>
+    <button class="modal-x" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="modal-body">
+    <div class="faq">
+      <details><summary>Does VERON need the internet to work?</summary><p>No. VERON runs fully offline on your computer — you can bill all day with no connection. Internet is only used to back up your data and to power the owner's mobile app on the paid plans.</p></details>
+      <details><summary>Is there a free trial?</summary><p>No — VERON is sold as a monthly licence, with no trial period. If you would like to see the software before buying, get in touch and we will be happy to show you.</p></details>
+      <details><summary>How is the licence delivered?</summary><p>Instantly. The licence is digital and activates inside the app the moment your payment is confirmed. Nothing is shipped.</p></details>
+      <details><summary>Will I be charged automatically every month?</summary><p>No. There is no auto-renewal and we do not store your card. Your licence simply expires at the end of the 30 days unless you choose to pay again.</p></details>
+      <details><summary>Who owns my data?</summary><p>You do. Your business data lives on your own computer. On the cloud plans it is also backed up to secure storage, scoped privately to your shop. We never sell your data.</p></details>
+      <details><summary>Can I run more than one outlet?</summary><p>Yes — the Max plan supports multiple counters and multiple outlets under one owner account.</p></details>
+    </div>
+  </div>
+</dialog>
 
-    <div class="block reveal">
+<dialog class="modal" id="m-terms">
+  <div class="modal-head">
+    <h3>Terms &amp; Conditions</h3>
+    <button class="modal-x" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="modal-body">
+    <div class="policy"><div class="block">
       <h3>Terms &amp; Conditions</h3>
       <p>By purchasing a VERON licence, you agree to the following terms.</p>
       <h4>The licence</h4>
@@ -725,7 +1305,17 @@
       </ul>
     </div>
 
-    <div class="block reveal" id="refund">
+    </div>
+  </div>
+</dialog>
+
+<dialog class="modal" id="m-refund">
+  <div class="modal-head">
+    <h3>Refund &amp; Cancellation Policy</h3>
+    <button class="modal-x" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="modal-body">
+    <div class="policy"><div class="block" id="refund">
       <h3>Refund &amp; Cancellation Policy</h3>
       <ul>
         <li>Because the licence is delivered digitally and activates immediately, <strong>payments are non-refundable</strong> once the licence has been issued.</li>
@@ -734,7 +1324,17 @@
       </ul>
     </div>
 
-    <div class="block reveal" id="privacy">
+    </div>
+  </div>
+</dialog>
+
+<dialog class="modal" id="m-privacy">
+  <div class="modal-head">
+    <h3>Privacy Policy</h3>
+    <button class="modal-x" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="modal-body">
+    <div class="policy"><div class="block" id="privacy">
       <h3>Privacy Policy</h3>
       <p>We collect only what is needed to provide the software and process your payment.</p>
       <ul>
@@ -743,66 +1343,55 @@
         <li>Payments are processed by our payment provider. We do not store your card or bank details on our systems.</li>
         <li>We do not sell your data to anyone.</li>
       </ul>
-    </div>
+    </div></div>
   </div>
-</section>
+</dialog>
 
-<!-- CONTACT -->
-<section id="contact" style="background:var(--bg2);border-top:1px solid var(--line)">
-  <div class="wrap contact">
-    <div class="eyebrow">We're here to help</div>
-    <h2 style="font-size:clamp(28px,4.5vw,38px);font-weight:800;letter-spacing:-0.8px;margin-top:12px">Get in touch</h2>
-    <div class="contact-box reveal">
-      <div class="label">Business name</div>
-      <div class="value brand">VERON</div>
-      <div style="height:16px"></div>
-      <div class="label">Email</div>
-      <div class="value"><a href="mailto:verontechapp@gmail.com">verontechapp@gmail.com</a></div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div class="foot-announce">
-        <div class="head">
-          <img src="veron-icon.png" alt="" />
-          <div class="name">VERON</div>
-        </div>
-        <p>Owners now carry the shop in their pocket — live sales, staff and stock, the moment anything changes.</p>
-      </div>
-    </div>
-    <div class="foot-divider"></div>
-    <div class="foot-bottom">
-      <div class="brand"><img class="logo" src="veron-icon.png" width="26" height="26" alt="" /> VERON, <span class="yr"></span>.</div>
-      <div class="foot-social">
-        <a href="mailto:verontechapp@gmail.com" aria-label="Email us" title="Email us">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="copy">© <span class="yr"></span> VERON — Point-of-sale software for restaurants &amp; bars. All rights reserved.<br />
-    VERON is a sole proprietorship owned and operated by Aditya Namdeo Bhoye, registered under Udyam Registration No. UDYAM-MH-23-0418290.</div>
-  </div>
-</footer>
 
 <script>
 document.querySelectorAll('.yr').forEach(function(el){el.textContent=new Date().getFullYear()});
 
-// Nav links scroll to their section but never touch the URL — no #fragment
-// ever lands in the address bar, so a click never reads as "navigating
-// somewhere." Same effect as a real anchor, minus the history entry.
-document.querySelectorAll('.nav-links a[href^="#"], .btn-hero[href^="#"]').forEach(function(a){
-  a.addEventListener('click', function(e){
-    e.preventDefault();
-    var target = document.getElementById(a.getAttribute('href').slice(1));
-    if(!target) return;
-    var headerEl = document.querySelector('header');
-    var offset = (headerEl ? headerEl.offsetHeight : 0) + 24;
-    var y = target.getBoundingClientRect().top + window.pageYOffset - offset;
-    window.scrollTo({top:y, behavior:'smooth'});
+// Mobile nav toggle. Closes on link tap (the scroll handler below still runs,
+// so the menu is gone by the time the page moves), on outside click, and on
+// Escape — the three ways a user expects to dismiss it.
+var navEl = document.querySelector('.nav');
+var navToggle = document.querySelector('.nav-toggle');
+if (navEl && navToggle) {
+  var setNav = function(open){
+    navEl.classList.toggle('open', open);
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+  navToggle.addEventListener('click', function(e){
+    e.stopPropagation();
+    setNav(!navEl.classList.contains('open'));
   });
+  navEl.querySelectorAll('.nav-links a').forEach(function(a){
+    a.addEventListener('click', function(){ setNav(false); });
+  });
+  document.addEventListener('click', function(e){
+    if (navEl.classList.contains('open') && !navEl.contains(e.target)) setNav(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') setNav(false);
+  });
+}
+
+// EVERY in-page anchor scrolls instead of navigating — one delegated listener
+// on the document, so no #fragment ever lands in the address bar no matter
+// where the link lives (nav, hero, CTA, footer) or when it was added. A bare
+// href="#" returns to the top; modal triggers are left to their own handler.
+document.addEventListener('click', function(e){
+  var a = e.target.closest && e.target.closest('a[href^="#"]');
+  if (!a || a.hasAttribute('data-modal')) return;
+  e.preventDefault();
+  var id = a.getAttribute('href').slice(1);
+  if (!id) { window.scrollTo({top:0, behavior:'smooth'}); return; }
+  var target = document.getElementById(id);
+  if (!target) return;
+  var headerEl = document.querySelector('header');
+  var offset = (headerEl ? headerEl.offsetHeight : 0) + 24;
+  var y = target.getBoundingClientRect().top + window.pageYOffset - offset;
+  window.scrollTo({top:y, behavior:'smooth'});
 });
 
 var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -856,16 +1445,17 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
 // The featured plan's spin+breathe only run while it's actually on screen —
 // unlike the reveal observer above, this one keeps watching (no unobserve)
 // so scrolling back down pauses it again.
-var featuredPlan = document.querySelector('.plan.featured');
-if (featuredPlan) {
+var spinners = document.querySelectorAll('.plan.featured, .hero-shape, .new-btn');
+if (spinners.length) {
   if (reduceMotion || !('IntersectionObserver' in window)) {
-    featuredPlan.classList.add('animate');
+    spinners.forEach(function(el){ el.classList.add('animate'); });
   } else {
-    new IntersectionObserver(function(entries){
+    var spinIO = new IntersectionObserver(function(entries){
       entries.forEach(function(entry){
-        featuredPlan.classList.toggle('animate', entry.isIntersecting);
+        entry.target.classList.toggle('animate', entry.isIntersecting);
       });
-    }, {threshold:0.1}).observe(featuredPlan);
+    }, {threshold:0.1});
+    spinners.forEach(function(el){ spinIO.observe(el); });
   }
 }
 
@@ -905,6 +1495,24 @@ if (!reduceMotion && finePointer) {
     }, 'transform .3s cubic-bezier(.2,.8,.2,1)');
   });
 }
+
+// Legal + FAQ dialogs. <dialog> gives ESC-to-close, the backdrop and focus
+// containment for free; all that's left is opening, the close button, and
+// treating a click on the backdrop itself as a dismiss.
+document.querySelectorAll('[data-modal]').forEach(function(trigger){
+  trigger.addEventListener('click', function(e){
+    e.preventDefault();
+    var dlg = document.getElementById(trigger.getAttribute('data-modal'));
+    if (dlg && dlg.showModal) dlg.showModal();
+  });
+});
+document.querySelectorAll('.modal').forEach(function(dlg){
+  var x = dlg.querySelector('.modal-x');
+  if (x) x.addEventListener('click', function(){ dlg.close(); });
+  // The dialog element fills the viewport; a click landing on it rather than
+  // on .modal-body is a click on the backdrop.
+  dlg.addEventListener('click', function(e){ if (e.target === dlg) dlg.close(); });
+});
 
 // Click ripple — any button-shaped element, expanding from the exact
 // pointer position, self-removing once its animation ends.
