@@ -37,7 +37,14 @@
     padding:12px 22px;border-radius:12px;transition:box-shadow .25s,background .25s,border-color .25s;
     cursor:pointer;border:1px solid transparent;position:relative;overflow:hidden;isolation:isolate}
   .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
-    box-shadow:0 8px 24px rgba(226,59,59,0.28);animation:btnGlow 2.6s ease-in-out infinite}
+    box-shadow:0 8px 24px rgba(226,59,59,0.28);animation:btnGlow 2.6s ease-in-out infinite;
+    /* An animated box-shadow repaints every tick and can't be handed to the
+       compositor. It can't become an opacity fade on a pseudo-element either,
+       because .btn sets overflow:hidden for the ripple and that would clip the
+       glow away. So it stays a box-shadow, but only burns frames while the
+       button is actually on screen — same in-view gate as .plan.featured. */
+    animation-play-state:paused}
+  .btn-primary.animate{animation-play-state:running}
   @keyframes btnGlow{0%,100%{box-shadow:0 8px 24px rgba(226,59,59,.28),0 0 0 rgba(226,59,59,0)}
     50%{box-shadow:0 8px 26px rgba(226,59,59,.4),0 0 22px 3px rgba(226,59,59,.4)}}
   /* Hover takes over the glow outright — running the ambient keyframe AND a
@@ -74,15 +81,26 @@
     transform:scale(0);opacity:.6;animation:rippleAnim .6s ease-out forwards;pointer-events:none}
   @keyframes rippleAnim{to{transform:scale(1);opacity:0}}
 
-  /* Grain overlay — cheap texture so flat dark panels don't look sterile */
-  .noise{position:fixed;inset:0;z-index:2147483000;pointer-events:none;opacity:.035;mix-blend-mode:overlay;
+  /* Grain overlay — cheap texture so flat dark panels don't look sterile.
+     Deliberately NOT mix-blend-mode any more: a fixed, full-viewport blend
+     layer has to be re-composited against everything under it on every frame
+     that anything moves, which taxed every scroll and every animation on the
+     page for a texture at 3% opacity. Plain alpha instead, dialled down to
+     match, and the layer composites once. */
+  .noise{position:fixed;inset:0;z-index:2147483000;pointer-events:none;opacity:.022;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-  /* Cursor spotlight — desktop, fine-pointer only (enabled via JS) */
+  /* Cursor spotlight — desktop, fine-pointer only (enabled via JS).
+     This one MOVES every frame, so what it costs per frame matters most on the
+     page. It used to carry both a blur() filter and mix-blend-mode:soft-light,
+     which together forced a re-blend of the element and its backdrop on every
+     single frame it travelled. Both are gone: the radial gradient's own stops
+     already fade out softly enough that a 6px blur on a 440px circle was doing
+     nothing visible, and the alphas are raised slightly to make up for losing
+     soft-light. What's left is a plain translate — pure compositor work. */
   .cursor-glow{position:fixed;top:0;left:0;width:440px;height:440px;margin:-220px 0 0 -220px;
     border-radius:50%;pointer-events:none;z-index:3;opacity:0;transition:opacity .5s;will-change:transform;
-    background:radial-gradient(circle,rgba(226,59,59,0.20),rgba(255,106,77,0.09) 42%,transparent 72%);
-    filter:blur(6px);mix-blend-mode:soft-light}
+    background:radial-gradient(circle,rgba(226,59,59,0.13),rgba(255,106,77,0.06) 42%,transparent 72%)}
 
   /* Scroll reveal */
   .reveal{opacity:0;transform:translateY(26px);transition:opacity .75s cubic-bezier(.2,.7,.2,1),transform .75s cubic-bezier(.2,.7,.2,1)}
@@ -355,7 +373,10 @@
       inset -14px 0 26px -28px rgba(0,0,0,.4),
       0 8px 18px rgba(0,0,0,.5),
       0 32px 64px rgba(0,0,0,.7)}
-  .spanel::before,.step::before{content:"";position:absolute;inset:0;z-index:0;opacity:.05;mix-blend-mode:overlay;pointer-events:none;
+  /* Same grain as .noise, and plain alpha for the same reason: these sit on
+     cards that transform and re-shadow on hover, and a blended layer forces
+     the whole card to re-blend for every frame of that transition. */
+  .spanel::before,.step::before{content:"";position:absolute;inset:0;z-index:0;opacity:.032;pointer-events:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
   .spanel > *,.step > *{position:relative;z-index:2}
   /* Warm tiles take the hero's orange rather than the old red, cool tiles
@@ -612,73 +633,109 @@
 
 <!-- HERO (Redesigned) -->
 <style id="new-hero-styles">
+  /* A card, not a full-bleed band: the hero is held to the same 1080px column
+     every other section uses via .wrap, with a gutter either side so the
+     rounded corners actually read as corners instead of running off the
+     viewport. overflow:hidden then does double duty — it crops the decorative
+     shapes to the card edge. */
   .new-hero-section {
     position: relative;
-    margin-top: -100px;
+    max-width: var(--maxw);
+    width: calc(100% - 48px);
+    margin: -100px auto 0;
     padding: 120px 24px 0;
     text-align: center;
     overflow: hidden;
     border-radius: 32px;
     background: linear-gradient(to bottom, #030303 0%, #030303 50%, rgba(255, 106, 77, 0.6) 100%);
   }
-  /* Same spinning conic edge as the featured pricing card — the identical
-     six-stop gradient, violet included — reusing its --angle property and
-     spin keyframes. Opaque padding-box fill under a gradient confined to
-     border-box, so colour only ever shows in the rim itself. Paused off-screen:
-     a custom-property gradient repaints on the main thread every tick, and
-     these are big. The outer pair sits back on opacity alone, which keeps
-     the hues exactly equal to the inner pair's. --edge-offset enters each
-     shape at its own phase of the shared sweep, so the four rims never show
-     the same colour in the same place. */
+  /* The same spinning conic edge as the featured pricing card — the identical
+     six-stop gradient, violet included — but built differently now, because
+     four of these at 600px square is a different proposition to one card:
+     see ::before below. Still paused off-screen. The outer pair sits back on
+     opacity alone, which keeps its hues exactly equal to the inner pair's, and
+     --edge-offset enters each shape at its own phase of the sweep so the four
+     rims never show the same colour in the same place. */
   .hero-shape {
     position: absolute;
     top: -40px;
     width: 600px;
     height: 600px;
     --edge-offset: 0deg;
-    border: 3px solid transparent;
-    background:
-      linear-gradient(#060606, #060606) padding-box,
-      conic-gradient(from calc(var(--angle) + var(--edge-offset)),var(--accent),var(--accent2),#fff,var(--violet),var(--accent2),var(--accent)) border-box;
-    border-radius: 60px;
+    --r-shape: 60px;
+    --rim: 3px;
+    border-radius: var(--r-shape);
+    overflow: hidden;
     z-index: 0;
     pointer-events: none;
-    animation: spin 6s linear infinite;
+  }
+  /* The rim used to be a conic-gradient whose start angle was the animated
+     --angle property. That repaints a 600x600 gradient on the MAIN THREAD
+     every single frame, and four of these run at once — which is exactly what
+     made the hero stutter. Same picture, built so the compositor can do it:
+     the gradient is rasterised once and a plain transform:rotate spins it.
+     --edge-offset is now the layer's starting angle rather than the
+     gradient's, so the four rims still enter the sweep out of phase. */
+  .hero-shape::before {
+    content: '';
+    position: absolute;
+    inset: -25%;
+    background: conic-gradient(var(--accent),var(--accent2),#fff,var(--violet),var(--accent2),var(--accent));
+    animation: rimSpin 6s linear infinite;
     animation-play-state: paused;
   }
-  .hero-shape.animate { animation-play-state: running; }
+  .hero-shape.animate::before { animation-play-state: running; }
+  @keyframes rimSpin {
+    from { transform: rotate(var(--edge-offset)); }
+    to   { transform: rotate(calc(var(--edge-offset) + 360deg)); }
+  }
+  /* The opaque face laid over the spinning layer, inset by the rim width so
+     only that much of the gradient shows as an edge. Carries the inner glow,
+     which used to be an inset box-shadow on the element itself — that would
+     now paint underneath this and never be seen. */
+  .hero-shape::after {
+    content: '';
+    position: absolute;
+    inset: var(--rim);
+    border-radius: calc(var(--r-shape) - var(--rim));
+    background: #060606;
+  }
   .hero-shape-left {
     --edge-offset: 0deg;
     left: -450px;
     transform: rotate(45deg);
-    box-shadow: 40px -40px 150px -20px rgba(255, 106, 77, 0.25), inset -3px 3px 20px rgba(255, 130, 88, 0.4);
+    box-shadow: 40px -40px 150px -20px rgba(255, 106, 77, 0.25);
     z-index: 1;
   }
+  .hero-shape-left::after { box-shadow: inset -3px 3px 20px rgba(255, 130, 88, 0.4); }
   .hero-shape-left-outer {
     --edge-offset: 90deg;
     opacity: 0.55;
     left: -450px;
     top: 140px;
     transform: rotate(45deg);
-    box-shadow: 40px -40px 150px -20px rgba(255, 106, 77, 0.15), inset -3px 3px 20px rgba(255, 130, 88, 0.2);
+    box-shadow: 40px -40px 150px -20px rgba(255, 106, 77, 0.15);
     z-index: 0;
   }
+  .hero-shape-left-outer::after { box-shadow: inset -3px 3px 20px rgba(255, 130, 88, 0.2); }
   .hero-shape-right {
     --edge-offset: 180deg;
     right: -450px;
     transform: rotate(45deg);
-    box-shadow: -40px 40px 150px -20px rgba(255, 106, 77, 0.25), inset 3px -3px 20px rgba(255, 130, 88, 0.4);
+    box-shadow: -40px 40px 150px -20px rgba(255, 106, 77, 0.25);
     z-index: 1;
   }
+  .hero-shape-right::after { box-shadow: inset 3px -3px 20px rgba(255, 130, 88, 0.4); }
   .hero-shape-right-outer {
     --edge-offset: 270deg;
     opacity: 0.55;
     right: -450px;
     top: 140px;
     transform: rotate(45deg);
-    box-shadow: -40px 40px 150px -20px rgba(255, 106, 77, 0.15), inset 3px -3px 20px rgba(255, 130, 88, 0.2);
+    box-shadow: -40px 40px 150px -20px rgba(255, 106, 77, 0.15);
     z-index: 0;
   }
+  .hero-shape-right-outer::after { box-shadow: inset 3px -3px 20px rgba(255, 130, 88, 0.2); }
 
   .new-hero-content {
     position: relative;
@@ -815,16 +872,16 @@
      than a corner accent, so they scale down with the viewport and their
      offsets scale with them. Nothing here changes the desktop layout. */
   @media (max-width: 900px) {
-    .new-hero-section { margin-top: -80px; padding: 96px 18px 0; border-radius: 24px; }
-    .hero-shape { width: 380px; height: 380px; border-radius: 42px; border-width: 2px; }
+    .new-hero-section { width: calc(100% - 32px); margin-top: -80px; padding: 96px 18px 0; border-radius: 24px; }
+    .hero-shape { width: 380px; height: 380px; --r-shape: 42px; --rim: 2px; }
     .hero-shape-left, .hero-shape-left-outer { left: -280px; }
     .hero-shape-right, .hero-shape-right-outer { right: -280px; }
     .hero-shape-left-outer, .hero-shape-right-outer { top: 95px; }
     .new-shot-wrap { margin-top: 32px; }
   }
   @media (max-width: 560px) {
-    .new-hero-section { margin-top: -68px; padding: 84px 14px 0; border-radius: 18px; }
-    .hero-shape { width: 250px; height: 250px; border-radius: 28px; }
+    .new-hero-section { width: calc(100% - 24px); margin-top: -68px; padding: 84px 14px 0; border-radius: 18px; }
+    .hero-shape { width: 250px; height: 250px; --r-shape: 28px; }
     .hero-shape-left, .hero-shape-left-outer { left: -185px; }
     .hero-shape-right, .hero-shape-right-outer { right: -185px; }
     .hero-shape-left-outer, .hero-shape-right-outer { top: 62px; }
@@ -1420,12 +1477,25 @@ onScrollFrame();
 if (!reduceMotion && finePointer) {
   var glow = document.querySelector('.cursor-glow');
   var mx = window.innerWidth/2, my = window.innerHeight/2, gx = mx, gy = my;
-  window.addEventListener('mousemove', function(e){ mx = e.clientX; my = e.clientY; }, {passive:true});
-  (function loop(){
-    gx += (mx-gx)*0.12; gy += (my-gy)*0.12;
+  // The easing loop used to run forever at 60fps, whether or not the pointer
+  // had moved — a permanent rAF callback and style write on a page that was
+  // otherwise idle, which is enough on its own to keep a laptop's GPU awake
+  // and to make everything ELSE animating fight for the frame. Now the loop
+  // only lives while the glow is still catching up, and a mousemove restarts
+  // it. Once it's within half a pixel of the cursor it stops until you move.
+  var glowRunning = false;
+  function glowLoop(){
+    var dx = mx - gx, dy = my - gy;
+    if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) { glowRunning = false; return; }
+    gx += dx*0.12; gy += dy*0.12;
     glow.style.transform = 'translate3d('+gx+'px,'+gy+'px,0)';
-    requestAnimationFrame(loop);
-  })();
+    requestAnimationFrame(glowLoop);
+  }
+  window.addEventListener('mousemove', function(e){
+    mx = e.clientX; my = e.clientY;
+    if (!glowRunning) { glowRunning = true; requestAnimationFrame(glowLoop); }
+  }, {passive:true});
+  glow.style.transform = 'translate3d('+gx+'px,'+gy+'px,0)';
   glow.style.opacity = 1;
 }
 
@@ -1445,7 +1515,7 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
 // The featured plan's spin+breathe only run while it's actually on screen —
 // unlike the reveal observer above, this one keeps watching (no unobserve)
 // so scrolling back down pauses it again.
-var spinners = document.querySelectorAll('.plan.featured, .hero-shape, .new-btn');
+var spinners = document.querySelectorAll('.plan.featured, .hero-shape, .new-btn, .btn-primary');
 if (spinners.length) {
   if (reduceMotion || !('IntersectionObserver' in window)) {
     spinners.forEach(function(el){ el.classList.add('animate'); });
