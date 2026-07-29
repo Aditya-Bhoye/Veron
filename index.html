@@ -633,14 +633,19 @@
 
 <!-- HERO (Redesigned) -->
 <style id="new-hero-styles">
-  /* A card, not a full-bleed band: the hero is held to the same 1080px column
-     every other section uses via .wrap, with a gutter either side so the
-     rounded corners actually read as corners instead of running off the
-     viewport. overflow:hidden then does double duty — it crops the decorative
-     shapes to the card edge. */
+  /* A card, not a full-bleed band, with a gutter either side so the rounded
+     corners actually read as corners instead of running off the viewport.
+     overflow:hidden then does double duty — it crops the decorative shapes to
+     the card edge.
+
+     It runs wider than the --maxw column the other sections share: the hero is
+     the one place carrying a full product screenshot, and it wants the room.
+     Deliberately its OWN value rather than a change to --maxw, which would
+     drag features/pricing/footer out with it. */
   .new-hero-section {
+    --hero-w: 1280px;
     position: relative;
-    max-width: var(--maxw);
+    max-width: var(--hero-w);
     width: calc(100% - 48px);
     margin: -100px auto 0;
     padding: 120px 24px 0;
@@ -835,9 +840,13 @@
       inset 0 0 16px rgba(226, 59, 59, 0.4);
   }
 
+  /* Fills the card's content box rather than carrying its own 1040px cap, so
+     widening the card widens the screenshot with it instead of stranding it in
+     the middle. The source image is 1915px wide, so there's headroom before it
+     starts upscaling. */
   .new-shot-wrap {
     position: relative;
-    max-width: 1040px;
+    max-width: 100%;
     margin: 40px auto 0;
     z-index: 2;
   }
