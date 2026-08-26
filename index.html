@@ -329,44 +329,9 @@
     radial-gradient(ellipse 900px 380px at 50% 4%,rgba(226,59,59,.08),transparent 70%),
     var(--bg)}
 
-  /* Features — the classic asymmetric bento: a tall hero tile, three
-     stacked cards in the middle column, a tall card + one more on the
-     right. Every card is its own rounded, gapped tile (not edge-to-edge),
-     text anchored consistently bottom-left, pure typography — no icon, no
-     illustration, no external image. Hero is the same coded gradient as
-     every other card, just bigger (spans 2 rows) — not a solid colour. */
-  .showcase{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:190px;gap:16px}
-  /* Carved-in look: light catches the top inner edge, the walls shade inward,
-     and a thin lit lip under the bottom border lifts the card off the page. */
-  .spanel{position:relative;padding:22px;border-radius:20px;border:1px solid var(--line);
-    display:flex;flex-direction:column;justify-content:flex-end;color:#fff;
-    overflow:hidden;transition:transform .3s,box-shadow .3s;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
-      inset 0 20px 30px -24px rgba(0,0,0,.5),
-      inset 0 -18px 28px -24px rgba(0,0,0,.45),
-      inset 14px 0 26px -28px rgba(0,0,0,.4),
-      inset -14px 0 26px -28px rgba(0,0,0,.4),
-      0 4px 10px rgba(0,0,0,.45),
-      0 20px 44px rgba(0,0,0,.6)}
-  .spanel:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
-      inset 0 20px 30px -24px rgba(0,0,0,.5),
-      inset 0 -18px 28px -24px rgba(0,0,0,.45),
-      inset 14px 0 26px -28px rgba(0,0,0,.4),
-      inset -14px 0 26px -28px rgba(0,0,0,.4),
-      0 8px 18px rgba(0,0,0,.5),
-      0 32px 64px rgba(0,0,0,.7)}
-  .spanel::before,.step::before{content:"";position:absolute;inset:0;z-index:0;opacity:.05;mix-blend-mode:overlay;pointer-events:none;
+  .bcard::before,.step::before{content:"";position:absolute;inset:0;z-index:0;opacity:.05;mix-blend-mode:overlay;pointer-events:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-  .spanel > *,.step > *{position:relative;z-index:2}
-  /* Warm tiles take the hero's orange rather than the old red, cool tiles
-     take the palette's violet rather than a neutral grey — so the bento
-     reads as the same two-colour scheme as the hero and pricing rim. */
-  .spanel.warm,.step.warm{background:
-    radial-gradient(120% 100% at 85% 88%,rgba(255,106,77,.4),transparent 60%),
-    linear-gradient(150deg,#18181a 0%,#1c120e 60%,#2a1710 100%)}
-  .spanel.cool,.step.cool{background:
-    radial-gradient(120% 100% at 85% 88%,rgba(124,108,246,.3),transparent 60%),
-    linear-gradient(150deg,#18181a 0%,#17161d 60%,#211f2e 100%)}
+  .bcard > *,.step > *{position:relative;z-index:2}
   .spanel.hero{grid-column:1;grid-row:1/3}
   .f-ledger{grid-column:1;grid-row:3}
   .f-billing{grid-column:2;grid-row:1}
@@ -375,66 +340,409 @@
   .f-mobile{grid-column:3;grid-row:1/3}
   .f-inventory{grid-column:3;grid-row:3}
 
-  .sbrand{position:absolute;top:16px;right:18px;display:flex;align-items:center;gap:6px;
-    font-size:10px;font-weight:700;letter-spacing:.4px;color:rgba(255,255,255,.8);z-index:3}
-  .sbrand img{width:16px;height:16px;border-radius:50%;display:block}
+  /* ══ FEATURE BENTO — redesigned ═════════════════════════════════════════
+     The old grid was three equal columns of carved gradient tiles, each led
+     by a big display numeral. It looked like seven of the same object, and
+     the numerals ("100%", "30s", "24/7") were doing marketing rather than
+     telling anyone what the software does.
 
-  /* --carve is the recess colour: a deep tint of the card's own hue, never
-     black, so the shading stays in family with the tile it's cut into. */
-  .shead-big{font-size:clamp(16px,1.8vw,19px);font-weight:800;line-height:1.15;letter-spacing:-0.3px;
-    --carve:rgba(92,34,13,.9);--carve-soft:rgba(92,34,13,.5);
-    text-shadow:-1px -1px 0 var(--carve),1px 1px 0 rgba(255,255,255,.10)}
-  .cool .shead-big{--carve:rgba(38,30,110,.9);--carve-soft:rgba(38,30,110,.5)}
-  .shead-big .num{display:block;font-size:clamp(30px,3.6vw,40px);color:var(--accent2);line-height:.95;margin-bottom:3px}
-  /* Carved numerals, lit from the lower right at 155deg rather than straight
-     down: the fill runs from a deep tint of the card's hue at the top-left of
-     each glyph to a hot highlight at the bottom-right, with the cast shadow
-     offset up-left and the lit lip down-right to match that one light source.
-     Gated on background-clip:text — the transparent fill would erase the
-     number outright without it. */
-  @supports ((-webkit-background-clip:text) or (background-clip:text)){
-    .shead-big .num{
-      background:linear-gradient(155deg,#7a3116 0%,#ad4c23 26%,var(--accent2) 62%,#ff9d78 100%);
-      -webkit-background-clip:text;background-clip:text;color:transparent;
-      text-shadow:none;
-      filter:drop-shadow(-1px -1px 0 var(--carve))
-             drop-shadow(1px 1px 0 rgba(255,255,255,.13))}
-    .cool .shead-big .num{
-      background:linear-gradient(155deg,#332c8a 0%,#4f45bd 26%,var(--violet) 62%,#a99fff 100%);
-      -webkit-background-clip:text;background-clip:text}
+     This is a different thing: an irregular four-column grid where tile SIZE
+     carries the hierarchy, flat panels with a hairline edge instead of carved
+     shadow, and each card led by its mark in a chip rather than a number.
+     Back on the site palette -- red, orange, violet -- so the section belongs
+     to the page again instead of being a green island in it. */
+  .bento{
+    display:grid; grid-template-columns:repeat(4,1fr);
+    grid-auto-rows:236px; gap:14px;
   }
-  .ssub{font-size:12.5px;color:var(--muted);margin-top:8px;max-width:220px;line-height:1.5}
-  .ssub .hl{background:var(--accent);color:#fff;padding:1px 7px;border-radius:3px;font-weight:700;white-space:nowrap}
+  .bcard{
+    position:relative; overflow:hidden;
+    display:flex; flex-direction:column; align-items:flex-start;
+    justify-content:flex-start;
+    padding:22px; border-radius:18px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    transition:border-color .35s, transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s;
+  }
+  /* One accent wash per card, bottom-right, barely there until hover. It is
+     what keeps a flat panel from reading as an empty box. */
+  .bcard::after{
+    content:""; position:absolute; right:-30%; bottom:-45%;
+    width:75%; aspect-ratio:1; border-radius:50%; z-index:0;
+    background:radial-gradient(circle,rgba(var(--c),.34),transparent 68%);
+    filter:blur(26px); opacity:.55; transition:opacity .35s, transform .35s;
+  }
+  .bcard:hover{
+    border-color:rgba(var(--c),.42); transform:translateY(-3px);
+    box-shadow:0 18px 40px rgba(0,0,0,.45);
+  }
+  .bcard:hover::after{opacity:1; transform:scale(1.12)}
 
-  @media(max-width:860px){
-    .showcase{grid-template-columns:1fr;grid-auto-rows:auto}
-    .showcase .spanel{grid-column:1 !important;grid-row:auto !important;min-height:170px}
+  /* Site palette, spread across the seven so no two neighbours match. */
+  .b-offline  {--c:226,59,59}
+  .b-billing  {--c:255,106,77}
+  .b-kitchen  {--c:124,108,246}
+  .b-staff    {--c:255,106,77}
+  .b-mobile   {--c:226,59,59}
+  .b-inventory{--c:124,108,246}
+  .b-ledger   {--c:255,106,77}
+
+  /* ---- The card graphics -------------------------------------------------
+     The tiles used to be led by an abstract mark -- three circles, three
+     bars, three rounded rects -- which was decoration standing in for a
+     picture of the product. Each tile now carries a small mock-up of the
+     screen it is actually talking about, built from real-looking VERON data:
+     a till holding bills while the line is down, a receipt, kitchen tickets,
+     an attendance list, the phone dashboard, a stock list, a udhaar ledger.
+
+     Each sits in the bottom of its tile, sized so the whole of it lands
+     inside: an earlier pass let them bleed off the right and bottom edges for
+     the look of it, and the crop ate the rupee figures, the status chips and
+     the queue line -- the half of every row that carries the meaning. A
+     mock-up that cannot be read is just texture. Every one is inert to the
+     pointer -- the tile itself owns the hover. */
+  .bviz{
+    position:absolute; pointer-events:none;
+    transition:transform .6s cubic-bezier(.22,.68,.24,1), opacity .5s ease;
+    will-change:transform;
+  }
+  /* .bcard > * lifts every direct child to z-index 2; the graphic is the one
+     thing that must sit UNDER the words. */
+  .bcard > .bviz{z-index:1}
+  .bcard:hover .bviz{transform:translateY(-5px)}
+
+  /* --- the shared vocabulary the mock-ups are assembled from ------------- */
+  .vpanel{
+    border-radius:12px; overflow:hidden;
+    background:linear-gradient(180deg,rgba(38,38,44,.96),rgba(22,22,26,.96));
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 20px 38px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+    transition:border-color .45s ease, box-shadow .45s ease;
+  }
+  .bcard:hover .vpanel{border-color:rgba(var(--c),.34);
+    box-shadow:0 24px 46px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 1px rgba(var(--c),.10)}
+  .vbar{display:flex; align-items:center; gap:6px; padding:7px 10px;
+    background:rgba(255,255,255,.05); border-bottom:1px solid rgba(255,255,255,.07);
+    font-size:9px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:#8b8b96}
+  .vrow{display:flex; align-items:center; gap:7px; padding:6.5px 10px;
+    font-size:10.5px; line-height:1.15; color:#c4c4ce; white-space:nowrap}
+  .vrow + .vrow{border-top:1px solid rgba(255,255,255,.055)}
+  .vname{flex:1; overflow:hidden; text-overflow:ellipsis}
+  .vamt{font-weight:700; color:#fff; font-variant-numeric:tabular-nums}
+  .vchip{font-size:8px; font-weight:800; letter-spacing:.3px; padding:2.5px 6px; border-radius:999px;
+    background:rgba(var(--c),.16); color:rgb(var(--c)); border:1px solid rgba(var(--c),.30)}
+  .vchip.ok{background:rgba(52,199,89,.14); color:#4ade80; border-color:rgba(52,199,89,.30)}
+  .vchip.mute{background:rgba(255,255,255,.05); color:#8b8b96; border-color:rgba(255,255,255,.10)}
+  /* A chip whose state clears on hover: it takes the green with it. */
+  .vchip.turns{transition:background .45s ease, border-color .45s ease, color .45s ease}
+  .bcard:hover .vchip.turns{
+    background:rgba(52,199,89,.14); color:#4ade80; border-color:rgba(52,199,89,.30)}
+  /* A live dot: the one thing that moves without being asked to. */
+  .vdot{width:6px; height:6px; border-radius:50%; background:rgb(var(--c)); flex:none;
+    box-shadow:0 0 0 0 rgba(var(--c),.6); animation:vpulse 2.4s ease-out infinite}
+  @keyframes vpulse{
+    0%{box-shadow:0 0 0 0 rgba(var(--c),.55)}
+    70%{box-shadow:0 0 0 7px rgba(var(--c),0)}
+    100%{box-shadow:0 0 0 0 rgba(var(--c),0)}}
+
+  /* Two lines of text in a one-line window: hover slides the second up into
+     view. It is how every "state changed" beat in the bento is done, so the
+     seven tiles all move the same way. */
+  .vflip{display:inline-block; overflow:hidden; height:var(--fh,12px); vertical-align:-2px}
+  .vflip > span{display:block; height:var(--fh,12px); line-height:var(--fh,12px);
+    transition:transform .6s cubic-bezier(.22,.68,.24,1)}
+  .bcard:hover .vflip > span{transform:translateY(calc(var(--fh,12px) * -1))}
+
+  /* Rows deal themselves in when the tile scrolls into view. .in is added by
+     the same observer that runs .reveal, so the two land together. */
+  .bviz .vrow, .bviz .vticket{opacity:0; transform:translateY(8px)}
+  .bcard.in .bviz .vrow, .bcard.in .bviz .vticket{opacity:1; transform:none;
+    transition:opacity .55s ease var(--d,0ms), transform .55s cubic-bezier(.22,.68,.24,1) var(--d,0ms),
+               background .4s ease, border-color .4s ease, color .4s ease}
+  .bviz .vrow:nth-child(2){--d:80ms} .bviz .vrow:nth-child(3){--d:160ms}
+  .bviz .vrow:nth-child(4){--d:240ms} .bviz .vrow:nth-child(5){--d:320ms}
+  .bviz .vrow:nth-child(6){--d:400ms} .bviz .vrow:nth-child(7){--d:480ms}
+
+  /* -- 1 - Offline till ---------------------------------------------------
+     Bills pile up on the machine with the line down; hover is the moment the
+     line comes back -- the header flips to Synced and the queue bar fills. */
+  .viz-offline{left:22px; right:22px; bottom:6px}
+  .viz-offline .vrow{font-size:11.5px; padding:8px 13px}
+  .viz-offline .vbar{padding:8px 13px; font-size:9.5px}
+  .viz-offline .vqueue{padding:10px 13px 12px; font-size:10px}
+  .viz-offline .vnet{margin-left:auto; font-size:8.5px; letter-spacing:.3px; text-transform:none;
+    font-weight:800; padding:2.5px 7px; border-radius:999px;
+    background:rgba(var(--c),.16); border:1px solid rgba(var(--c),.32); color:rgb(var(--c));
+    transition:background .5s, border-color .5s, color .5s}
+  .bcard:hover .viz-offline .vnet{background:rgba(52,199,89,.15); border-color:rgba(52,199,89,.34); color:#4ade80}
+  .viz-offline .vqueue{padding:9px 10px 11px; border-top:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.02); font-size:9.5px; color:#8b8b96; letter-spacing:.2px}
+  .vtrack{display:block; height:3px; border-radius:2px; background:rgba(255,255,255,.08);
+    overflow:hidden; margin-bottom:7px}
+  .vfill{display:block; height:100%; width:100%; border-radius:2px;
+    background:linear-gradient(90deg,rgb(var(--c)),#ff9d78);
+    transform:scaleX(var(--p,.34)); transform-origin:0 50%;
+    transition:transform .9s cubic-bezier(.3,.8,.3,1) .1s, background .6s}
+  .bcard:hover .vfill{transform:scaleX(1);
+    background:linear-gradient(90deg,#34c759,#4ade80)}
+
+  /* -- 2 - Receipt --------------------------------------------------------
+     A bill torn off the printer; hover stamps it PAID. */
+  .viz-bill{left:22px; right:22px; bottom:6px}
+  .viz-bill .vpanel{border-radius:10px 10px 0 0}
+  .viz-bill .vtotal{display:flex; align-items:center; justify-content:space-between;
+    padding:8px 10px; font-size:10.5px; color:#8b8b96; letter-spacing:.3px;
+    border-top:1px dashed rgba(255,255,255,.18); background:rgba(var(--c),.07)}
+  .viz-bill .vtotal b{font-size:14px; color:#fff; font-variant-numeric:tabular-nums}
+  .viz-bill .vstamp{position:absolute; right:8px; top:-22px;
+    font-size:11px; font-weight:900; letter-spacing:1.6px; padding:3px 9px; border-radius:5px;
+    color:#4ade80; border:2px solid rgba(52,199,89,.55); background:rgba(12,12,14,.9);
+    opacity:0; transform:rotate(-14deg) scale(1.6);
+    transition:opacity .3s ease, transform .45s cubic-bezier(.2,1.5,.4,1)}
+  .bcard:hover .viz-bill .vstamp{opacity:1; transform:rotate(-14deg) scale(1)}
+
+  /* -- 3 - Kitchen tickets ------------------------------------------------
+     Three KOTs fanned like paper on a spike; hover squares them up and the
+     newest one drops into place. */
+  .viz-kot{left:22px; right:22px; bottom:8px; height:102px}
+  .viz-kot .vticket{position:absolute; left:0; right:0; top:0;
+    display:flex; align-items:center; gap:7px; padding:8px 10px;
+    font-size:10.5px; color:#c4c4ce; border-radius:10px;
+    background:linear-gradient(180deg,rgba(40,40,46,.97),rgba(24,24,28,.97));
+    border:1px solid rgba(255,255,255,.10); box-shadow:0 12px 22px rgba(0,0,0,.5);
+    transition:transform .55s cubic-bezier(.22,.68,.24,1), opacity .5s ease, border-color .45s ease}
+  .viz-kot .t1{z-index:3} .viz-kot .t2{z-index:2; --d:90ms} .viz-kot .t3{z-index:1; --d:180ms}
+  .bcard.in .viz-kot .t1{transform:translateY(0) rotate(-3deg)}
+  .bcard.in .viz-kot .t2{transform:translateY(32px) rotate(2deg)}
+  .bcard.in .viz-kot .t3{transform:translateY(63px) rotate(-1.5deg)}
+  .bcard:hover .viz-kot .t1{transform:translateY(-4px) rotate(0deg)}
+  .bcard:hover .viz-kot .t2{transform:translateY(31px) rotate(0deg)}
+  .bcard:hover .viz-kot .t3{transform:translateY(62px) rotate(0deg); border-color:rgba(var(--c),.45)}
+  /* Hover is a ticket being cleared: the middle one flips Pending to
+     Completed and takes the green with it. .turns is the shared rule for
+     that -- the steps use it too, for the installer finishing and the day
+     going live. */
+
+  /* -- 4 - Attendance -----------------------------------------------------
+     The ticks draw themselves in, one after another, on hover. */
+  .viz-staff{left:22px; right:22px; bottom:6px}
+  .viz-staff .vrow{padding:5px 10px}
+  .viz-staff .vbar{padding:4.5px 10px; font-size:8.5px}
+  .vav{width:16px; height:16px; border-radius:50%; flex:none; display:grid; place-items:center;
+    font-size:7px; font-weight:800; color:#fff; letter-spacing:.2px;
+    background:linear-gradient(135deg,rgba(var(--c),.95),rgba(var(--c),.45))}
+  .vtime{font-size:9.5px; color:#8b8b96; font-variant-numeric:tabular-nums}
+  .vtick{width:14px; height:14px; flex:none; color:#4ade80}
+  .vtick svg{width:100%; height:100%; display:block}
+  .vtick path{stroke-dasharray:18; stroke-dashoffset:18; transition:stroke-dashoffset .55s ease}
+  .bcard:hover .vtick path{stroke-dashoffset:0}
+  .viz-staff .vrow:nth-child(3) .vtick path{transition-delay:.12s}
+  .viz-staff .vrow:nth-child(4) .vtick path{transition-delay:.24s}
+
+  /* -- 5 - The phone ------------------------------------------------------
+     It breathes on its own; hover tilts it up, ticks the day's total over
+     and grows the week's bars. */
+  .viz-mobile{left:0; right:0; margin:0 auto; bottom:8px; width:186px; animation:vfloat 6s ease-in-out infinite}
+  @keyframes vfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  .bcard:hover .viz-mobile{animation-play-state:paused;
+    transform:translateY(-10px) rotate(-2deg) scale(1.03)}
+  .vphone{border-radius:22px; padding:8px 7px 11px;
+    background:linear-gradient(180deg,#2a2a30,#151519);
+    border:1px solid rgba(255,255,255,.13);
+    box-shadow:0 26px 46px rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.10)}
+  .vscreen{border-radius:15px; overflow:hidden; border:1px solid rgba(255,255,255,.06);
+    background:linear-gradient(180deg,#141418,#0e0e11)}
+  .vnotch{height:4px; width:34px; border-radius:3px; background:rgba(255,255,255,.16); margin:0 auto 7px}
+  .vhead{padding:14px 13px 11px}
+  .vlabel{display:flex; align-items:center; gap:5px; font-size:8.5px; font-weight:800;
+    letter-spacing:.6px; text-transform:uppercase; color:#8b8b96}
+  .vbig{font-size:23px; font-weight:800; color:#fff; letter-spacing:-.6px; margin-top:4px;
+    font-variant-numeric:tabular-nums}
+  .vdelta{display:inline-block; margin-top:6px; font-size:8.5px; font-weight:800; padding:2px 6px;
+    border-radius:999px; background:rgba(52,199,89,.14); color:#4ade80; border:1px solid rgba(52,199,89,.28)}
+  .vbars{display:flex; align-items:flex-end; gap:4px; height:66px; padding:0 13px 12px}
+  .vbars i{flex:1; border-radius:3px 3px 1px 1px; transform-origin:bottom; transform:scaleY(.62);
+    background:linear-gradient(180deg,rgb(var(--c)),rgba(var(--c),.28));
+    transition:transform .6s cubic-bezier(.3,.9,.3,1)}
+  .bcard:hover .vbars i{transform:scaleY(1)}
+  .vbars i:nth-child(2){transition-delay:.05s} .vbars i:nth-child(3){transition-delay:.10s}
+  .vbars i:nth-child(4){transition-delay:.15s} .vbars i:nth-child(5){transition-delay:.20s}
+  .vbars i:nth-child(6){transition-delay:.25s} .vbars i:nth-child(7){transition-delay:.30s}
+  .viz-mobile .vrow{padding:7.5px 13px; font-size:10px; border-top:1px solid rgba(255,255,255,.06)}
+
+  /* -- 6 - Stock ----------------------------------------------------------
+     Hover is the evening's pouring: every count drops to a second figure and
+     each bar drains to match it, --v to --v2, so the number and the bar are
+     never telling different stories.
+
+     The Low chip is not decoration sitting on the row -- it is the alert
+     firing. At rest nothing is low, and it only appears on the line whose
+     count crosses under 5 bottles, which is the whole claim the tile makes.
+     Until it fires, every figure sits hard against the right edge: the chip
+     is taken out of flow entirely and the count slides left to let it in,
+     rather than a permanently reserved gap holding one number out of line
+     with the two above it. */
+  .viz-stock{left:22px; right:22px; bottom:6px}
+  .viz-stock .vrow{flex-wrap:wrap; gap:5px 7px; padding:7px 10px}
+  .viz-stock .low{position:relative}
+  .viz-stock .vslot{position:absolute; right:10px; top:7px}
+  .viz-stock .low .vamt{transition:transform .45s cubic-bezier(.2,.8,.3,1) .3s}
+  .bcard:hover .viz-stock .low .vamt{transform:translateX(-40px)}
+  .vlevel{flex-basis:100%; height:3px; border-radius:2px; background:rgba(255,255,255,.08); overflow:hidden}
+  .vlevel span{display:block; height:100%; border-radius:2px; background:rgb(var(--c));
+    transform-origin:0 50%; transform:scaleX(var(--v,.6));
+    transition:transform .8s cubic-bezier(.3,.85,.3,1), background .5s}
+  .bcard:hover .vlevel span{transform:scaleX(var(--v2,.4))}
+  .viz-stock .low .vchip{background:rgba(226,59,59,.16); color:#ff7b6b;
+    border-color:rgba(226,59,59,.36);
+    opacity:0; transform:scale(.55);
+    transition:opacity .3s ease .35s, transform .45s cubic-bezier(.2,1.6,.4,1) .35s, box-shadow .45s}
+  .bcard:hover .viz-stock .low .vchip{opacity:1; transform:scale(1);
+    box-shadow:0 0 0 4px rgba(226,59,59,.12)}
+  /* The bar turns with the chip, on the same delay, so the row goes red as
+     one thing. */
+  .viz-stock .low .vlevel span{transition:transform .8s cubic-bezier(.3,.85,.3,1), background .4s ease .35s}
+  .bcard:hover .viz-stock .low .vlevel span{background:#ff5f56}
+  .bcard:hover .viz-stock .low{color:#fff}
+
+  /* -- 7 - Udhaar ledger --------------------------------------------------
+     Hover settles the last account: the amount strikes through and the
+     running total drops to what is actually still owed. */
+  .viz-ledger{right:22px; bottom:6px; width:258px}
+  .viz-ledger .vsettle .vamt{text-decoration:line-through transparent; text-decoration-thickness:1.5px;
+    transition:color .5s ease, text-decoration-color .5s ease}
+  .bcard:hover .viz-ledger .vsettle .vamt{color:#6b6b76; text-decoration-color:#6b6b76}
+  .viz-ledger .vfoot{display:flex; align-items:center; justify-content:space-between;
+    padding:8px 10px; font-size:9.5px; color:#8b8b96; letter-spacing:.2px;
+    border-top:1px solid rgba(255,255,255,.07); background:rgba(var(--c),.06)}
+  .viz-ledger .vfoot b{color:#fff; font-size:11.5px; font-variant-numeric:tabular-nums}
+
+  /* Nothing above may leave a tile blank when motion is off: the entrance
+     states are opacity:0, so they need an explicit resting value here rather
+     than relying on the global duration clamp. */
+  @media (prefers-reduced-motion: reduce){
+    .bviz .vrow, .bviz .vticket{opacity:1 !important; transform:none !important}
+    .viz-mobile{animation:none !important}
+    .vtick path{stroke-dashoffset:0 !important}
+    .viz-kot{height:auto}
+    .viz-kot .vticket{position:relative; margin-bottom:6px; box-shadow:none}
   }
 
-  /* Steps */
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:s}
+  /* Type came down a step when the mock-ups moved in: the words now share
+     the tile with a picture instead of owning it, and a 1x1 has to hold a
+     two-line title, a two-line line of copy AND a legible screenshot inside
+     236px. */
+  .btitle{
+    margin:0; font-size:19.5px; font-weight:800; letter-spacing:-.5px;
+    color:#fff; line-height:1.25;
+  }
+  .bdesc{margin:9px 0 0; font-size:12.4px; line-height:1.5; color:var(--muted);
+    max-width:31ch; position:relative; z-index:2}
+  .bdesc .hl{color:#fff; font-weight:600}
+
+  /* Size is the hierarchy: the two claims that sell the product get the room,
+     the rest read as the supporting list they are. */
+  .b-offline  {grid-column:1/3; grid-row:1/3}
+  .b-billing  {grid-column:3;   grid-row:1}
+  .b-mobile   {grid-column:4;   grid-row:1/3}
+  .b-kitchen  {grid-column:3;   grid-row:2}
+  .b-staff    {grid-column:1;   grid-row:3}
+  .b-inventory{grid-column:2;   grid-row:3}
+  .b-ledger   {grid-column:3/5; grid-row:3}
+
+  /* The big tile can afford more type; the wide one keeps its copy narrow
+     so it never runs under the ledger sitting on its right. */
+  .b-offline .btitle{font-size:34px; max-width:11ch}
+  .b-offline .bdesc{font-size:14px; max-width:30ch}
+  .b-ledger .btitle{font-size:23px}
+  .b-ledger .bdesc{max-width:24ch}
+  .b-mobile .bdesc{max-width:26ch}
+
+  /* Stacked, the tiles change shape: a 1x1 becomes half a screen wide and
+     the 2x2 loses its second row. Rather than chase that with min-heights --
+     which is what the first pass did, and it still let the till ride up over
+     its own headline at 480px -- the graphics come out of absolute position
+     and simply follow the copy, pushed to the foot of the tile by an auto
+     margin. Nothing can overlap anything after that. */
+  @media(max-width:1000px){
+    .bento{grid-template-columns:repeat(2,1fr); grid-auto-rows:auto}
+    .bento .bcard{grid-column:auto !important; grid-row:auto !important; min-height:236px}
+    .bento .b-offline{grid-column:1/3 !important}
+    .bento .bviz{position:relative; left:auto; right:auto; bottom:auto;
+      align-self:stretch; width:auto; margin-top:auto}
+    .bento .bdesc{margin-bottom:20px}
+    .bento .viz-mobile{align-self:center; width:186px}
+    /* The fan is angled for a 200px ticket. Stacked, a ticket is twice that
+       wide and the same rotation throws its far end 20px off the stack, so
+       the tickets stop looking like a pile and start looking broken. */
+    .bento .bcard.in .viz-kot .t1{transform:translateY(0)}
+    .bento .bcard.in .viz-kot .t2{transform:translateY(32px)}
+    .bento .bcard.in .viz-kot .t3{transform:translateY(63px)}
+  }
+  @media(max-width:620px){
+    .bento{grid-template-columns:1fr}
+    .bento .b-offline{grid-column:1 !important}
+  }
+
+  /* Restored: an earlier edit removed this rule along with the old bento CSS.
+     It carries BOTH the three-column layout and counter-reset -- so losing it
+     stacked the steps full-width AND silently broke the numbered ::before
+     counters, which have nothing to count from without it.
+     max-width keeps the three from stretching to the full 1080 wrap. */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;counter-reset:s}
   @media(max-width:900px){.steps{grid-template-columns:1fr}}
-  .step{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:28px;position:relative;
-    min-height:320px;display:flex;flex-direction:column;justify-content:flex-end;
-    transition:transform .3s,box-shadow .3s;overflow:hidden;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),
-      inset 0 18px 28px -22px rgba(0,0,0,.48),
-      inset 0 -16px 26px -22px rgba(0,0,0,.42),
-      inset 12px 0 24px -26px rgba(0,0,0,.38),
-      inset -12px 0 24px -26px rgba(0,0,0,.38),
-      0 4px 10px rgba(0,0,0,.4),
-      0 18px 40px rgba(0,0,0,.55)}
-  .step:hover{transform:translateY(-4px);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),
-      inset 0 18px 28px -22px rgba(0,0,0,.48),
-      inset 0 -16px 26px -22px rgba(0,0,0,.42),
-      inset 12px 0 24px -26px rgba(0,0,0,.38),
-      inset -12px 0 24px -26px rgba(0,0,0,.38),
-      0 8px 18px rgba(0,0,0,.45),
-      0 30px 60px rgba(0,0,0,.65)}
-  /* Steps borrow the bento cards' .shead-big/.ssub type outright — the only
-     change is letting the copy fill the column instead of a bento tile. */
-  .step .ssub{max-width:none}
+  /* ---- Steps, built from the same card as the bento ---------------------
+     Not "similar to" it -- the same object. Flat --panel back, the same
+     hairline, the same 18px radius and 22px padding, the same single accent
+     wash bottom-right, the same lift on hover. The two things that used to
+     make these read as a different site are gone: the carved warm/cool
+     gradient backs, which were a second wash fighting the first, and the
+     display numeral, which was the loudest type on the page.
+
+     What is left is text, because that is all a step needs: a marker, a
+     headline and a line of copy, set exactly as .btitle and .bdesc are set
+     upstairs. */
+  .step{
+    position:relative; overflow:hidden;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:18px; padding:22px;
+    min-height:206px; display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:flex-start;
+    transition:border-color .35s, transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s;
+  }
+  .step::after{
+    content:""; position:absolute; right:-30%; bottom:-45%;
+    width:75%; aspect-ratio:1; border-radius:50%; z-index:0;
+    background:radial-gradient(circle,rgba(var(--c),.34),transparent 68%);
+    filter:blur(26px); opacity:.55; transition:opacity .35s, transform .35s;
+  }
+  .step:hover{
+    border-color:rgba(var(--c),.42); transform:translateY(-3px);
+    box-shadow:0 18px 40px rgba(0,0,0,.45);
+  }
+  .step:hover::after{opacity:1; transform:scale(1.12)}
+  .steps .step:nth-child(1){--c:226,59,59}
+  .steps .step:nth-child(2){--c:255,106,77}
+  .steps .step:nth-child(3){--c:124,108,246}
+
+  /* The marker is a chip out of the bento's own kit rather than a numeral:
+     the count comes from the counter, so the markup never has to say which
+     step it is. Kept off ::before deliberately -- that pseudo-element is
+     already carrying the grain the tiles have. */
+  .shead-big{margin:0}
+  .shead-big .num{
+    display:block; width:max-content; max-width:100%; margin-bottom:11px;
+    font-size:9px; font-weight:800; letter-spacing:.6px; text-transform:uppercase;
+    padding:3.5px 9px; border-radius:999px;
+    color:rgb(var(--c)); background:rgba(var(--c),.14); border:1px solid rgba(var(--c),.30);
+  }
+  .shead-big .num::before{counter-increment:s; content:"Step " counter(s) " · "}
+  /* .btitle, to the letter. */
+  .shead-big{font-size:19.5px; font-weight:800; letter-spacing:-.5px; color:#fff; line-height:1.25}
+  /* .bdesc, to the letter, at the wider measure this card can carry. */
+  .ssub{margin:9px 0 0; font-size:13px; line-height:1.5; color:var(--muted); max-width:40ch}
+  .ssub .hl{color:#fff; font-weight:600}
+  .step .shead-big, .step .ssub{align-self:stretch}
 
   /* Pricing */
   .pricing-wrap{position:relative}
@@ -778,6 +1086,56 @@
       inset 0 0 16px rgba(226, 59, 59, 0.4);
   }
 
+
+  /* ---- Floating product cards, around the screenshot ---------------------
+     The spinning shapes set the mood; these say what the software does. Each
+     is a real moment from it -- a table settling up, the day's total, a bottle
+     running low, a waiter marking in -- so somebody who never scrolls past the
+     fold has still seen it work.
+
+     Anchored to .new-shot-wrap (already position:relative) rather than to the
+     section, so they track the screenshot's edges at every width instead of
+     drifting away from it. Negative offsets on purpose: overlapping the frame
+     is what makes them read as sitting IN FRONT of the screen rather than
+     floating in the margin beside it.
+
+     .new-shot has overflow:hidden but that is the inner frame -- these live in
+     the wrapper, so nothing clips them. */
+  .shotcard{
+    position:absolute; z-index:4; display:flex; align-items:center; gap:10px;
+    padding:10px 14px; border-radius:14px; white-space:nowrap;
+    font-size:12.5px; font-weight:500; color:#e9e9ec;
+    background:rgba(20,20,23,.74);
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.10);
+    box-shadow:0 18px 40px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07);
+    animation:shotcard-bob 7s ease-in-out infinite;
+  }
+  .shotcard b{font-weight:700; color:#fff}
+  .shotcard .sc-dot{width:7px; height:7px; border-radius:50%; flex:none}
+  .shotcard .ok{background:#34C759; box-shadow:0 0 0 3px rgba(52,199,89,.18)}
+  .shotcard .warn{background:#FFB020; box-shadow:0 0 0 3px rgba(255,176,32,.18)}
+  .shotcard .sc-av{
+    width:20px; height:20px; border-radius:50%; flex:none;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:grid; place-items:center; font-size:9px; font-weight:800; color:#fff;
+  }
+  .shotcard svg{display:block; flex:none}
+
+  /* One drift, four phases, so they never rise and fall together. */
+  @keyframes shotcard-bob{
+    0%,100%{transform:translateY(0)}
+    50%    {transform:translateY(-9px)}
+  }
+  .sc-1{left:-64px;  top:14%; animation-delay:-.2s}
+  .sc-2{left:-34px;  top:54%; animation-delay:-2.4s}
+  .sc-3{right:-64px; top:9%;  animation-delay:-1.2s}
+  .sc-4{right:-30px; top:48%; animation-delay:-3.6s}
+
+  /* The wrapper is capped at 1040px and the section clips its overflow, so
+     below this the negative offsets would be cut off mid-card. */
+  @media(max-width:1280px){ .shotcard{display:none} }
+
   .new-shot-wrap {
     position: relative;
     max-width: 1040px;
@@ -988,6 +1346,10 @@
   </div>
 
   <div class="new-shot-wrap">
+    <div class="shotcard sc-1"><span class="sc-dot ok"></span>Table 4 settled <b>&#8377;1,240</b></div>
+    <div class="shotcard sc-2"><svg width="46" height="16" viewBox="0 0 46 16" fill="none" aria-hidden="true"><path d="M1 13 L9 9 L16 11 L23 5 L31 7 L38 2 L45 4" stroke="#34C759" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Today <b>&#8377;48,320</b></span></div>
+    <div class="shotcard sc-3"><span class="sc-dot warn"></span>Old Monk &mdash; <b>3 left</b></div>
+    <div class="shotcard sc-4"><span class="sc-av">R</span>Ramesh <b>present</b></div>
     <div class="new-shot-topglow"></div>
     <div class="new-shot">
       <img src="dashboard-screenshot.png" alt="VERON dashboard">
@@ -1002,47 +1364,105 @@
       <h2>One app for the whole shop</h2>
       <p>Built for the pace of a real restaurant floor — on the machine you already own.</p>
     </div>
-    <div class="showcase">
-      <div class="spanel warm hero reveal">
-        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
-        <div class="shead-big"><span class="num">100%</span>Works fully offline</div>
-        <p class="ssub">No internet needed to bill — the cloud is a <span class="hl">backup, never a dependency</span>.</p>
+    <div class="bento">
+      <div class="bcard b-offline reveal">
+        <h3 class="btitle">The internet can go down</h3>
+        <p class="bdesc">No internet needed to bill &mdash; the cloud is a <span class="hl">backup, never a dependency</span>.</p>
+        <div class="bviz viz-offline" aria-hidden="true">
+          <div class="vpanel">
+            <div class="vbar"><span class="vdot"></span>Counter 1 &middot; VERON
+              <span class="vnet"><span class="vflip" style="--fh:11px"><span>Offline</span><span>Synced</span></span></span>
+            </div>
+            <div class="vrow"><span class="vname">#1042 &middot; Table 4</span><span class="vamt">&#8377;1,240</span><span class="vchip ok">Saved</span></div>
+            <div class="vrow"><span class="vname">#1043 &middot; Quick Sale</span><span class="vamt">&#8377;385</span><span class="vchip ok">Saved</span></div>
+            <div class="vrow"><span class="vname">#1044 &middot; Table 9</span><span class="vamt">&#8377;2,115</span><span class="vchip ok">Saved</span></div>
+            <div class="vrow"><span class="vname">#1045 &middot; Table 2</span><span class="vamt">&#8377;640</span><span class="vchip ok">Saved</span></div>
+            <div class="vrow"><span class="vname">#1046 &middot; Table 1</span><span class="vamt">&#8377;1,470</span><span class="vchip ok">Saved</span></div>
+            <div class="vqueue">
+              <span class="vtrack"><span class="vfill"></span></span>
+              <span class="vflip" style="--fh:12px"><span>5 bills held on this machine</span><span>5 bills pushed to the cloud</span></span>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div class="spanel warm f-billing reveal">
-        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
-        <div class="shead-big"><span class="num">30s</span>Fast billing</div>
-        <p class="ssub">Split payments, discounts and tax — <span class="hl">built for a busy floor</span>.</p>
+      <div class="bcard b-billing reveal">
+        <h3 class="btitle">A bill in thirty seconds</h3>
+        <p class="bdesc">Split payments, discounts and tax &mdash; <span class="hl">built for a busy floor</span>.</p>
+        <div class="bviz viz-bill" aria-hidden="true">
+          <div class="vpanel">
+            <div class="vrow"><span class="vname">Paneer Tikka</span><span class="vamt">&#8377;320</span></div>
+            <div class="vrow"><span class="vname">Butter Naan &times;2</span><span class="vamt">&#8377;90</span></div>
+            <div class="vtotal"><span>Total &middot; incl. GST</span><b>&#8377;431</b></div>
+          </div>
+          <span class="vstamp">PAID</span>
+        </div>
       </div>
-
-      <div class="spanel cool f-kitchen reveal">
-        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
-        <div class="shead-big"><span class="num">Instant</span>Kitchen display</div>
-        <p class="ssub">Every order lands on screen the instant it's placed — <span class="hl">no shouted tickets</span>.</p>
+      <div class="bcard b-kitchen reveal">
+        <h3 class="btitle">The kitchen already knows</h3>
+        <p class="bdesc">Orders land on screen instantly.</p>
+        <div class="bviz viz-kot" aria-hidden="true">
+          <div class="vticket t1"><span class="vname">Table 4 &middot; 3 items</span><span class="vchip ok">Completed</span></div>
+          <div class="vticket t2"><span class="vname">Table 7 &middot; 2 items</span><span class="vchip turns"><span class="vflip" style="--fh:11px"><span>Pending</span><span>Completed</span></span></span></div>
+          <div class="vticket t3"><span class="vdot"></span><span class="vname">Quick Sale &middot; 5 items</span><span class="vchip">Pending</span></div>
+        </div>
       </div>
-
-      <div class="spanel warm f-staff reveal">
-        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
-        <div class="shead-big"><span class="num">24/7</span>Staff &amp; attendance</div>
-        <p class="ssub">Attendance, salaries and advances — <span class="hl">one account per staff member</span>.</p>
+      <div class="bcard b-staff reveal">
+        <h3 class="btitle">Every shift accounted for</h3>
+        <p class="bdesc">Attendance, salaries and advances.</p>
+        <div class="bviz viz-staff" aria-hidden="true">
+          <div class="vpanel">
+            <div class="vbar">Today &middot; 3 present</div>
+            <div class="vrow"><span class="vav">RS</span><span class="vname">Ramesh S.</span><span class="vtime">9:02</span><span class="vtick"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6" opacity=".22"/><path d="M7 12.4 L10.6 16 L17.2 8.4" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="vrow"><span class="vav">FK</span><span class="vname">Farah K.</span><span class="vtime">9:15</span><span class="vtick"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6" opacity=".22"/><path d="M7 12.4 L10.6 16 L17.2 8.4" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="vrow"><span class="vav">IQ</span><span class="vname">Imran Q.</span><span class="vtime">9:40</span><span class="vtick"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6" opacity=".22"/><path d="M7 12.4 L10.6 16 L17.2 8.4" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+        </div>
       </div>
-
-      <div class="spanel warm f-mobile reveal">
-        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
-        <div class="shead-big"><span class="num">Live</span>Owner's mobile app</div>
-        <p class="ssub">See today's sales, staff and stock live on your phone — <span class="hl">wherever you are</span>.</p>
+      <div class="bcard b-mobile reveal">
+        <h3 class="btitle">Your shop, in your pocket</h3>
+        <p class="bdesc">Today's sales, staff and stock live on your phone &mdash; <span class="hl">wherever you are</span>.</p>
+        <div class="bviz viz-mobile" aria-hidden="true">
+          <div class="vphone">
+            <div class="vnotch"></div>
+            <div class="vscreen">
+              <div class="vhead">
+                <div class="vlabel"><span class="vdot"></span>Today &middot; live</div>
+                <div class="vbig"><span class="vflip" style="--fh:27px"><span>&#8377;18,420</span><span>&#8377;19,060</span></span></div>
+                <span class="vdelta">&#9650; 12% vs last Tue</span>
+              </div>
+              <div class="vbars">
+                <i style="height:34%"></i><i style="height:52%"></i><i style="height:44%"></i>
+                <i style="height:70%"></i><i style="height:58%"></i><i style="height:86%"></i><i style="height:100%"></i>
+              </div>
+              <div class="vrow"><span class="vname">Bills today</span><span class="vamt">64</span></div>
+              <div class="vrow"><span class="vname">Udhaar open</span><span class="vamt">&#8377;2,340</span></div>
+              <div class="vrow"><span class="vname">Top seller</span><span class="vamt">Paneer Tikka</span></div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div class="spanel cool f-inventory reveal">
-        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
-        <div class="shead-big">Live inventory</div>
-        <p class="ssub">Stock counts update as you sell, with alerts before you <span class="hl">run out</span>.</p>
+      <div class="bcard b-inventory reveal">
+        <h3 class="btitle">Stock that counts itself</h3>
+        <p class="bdesc">Every bottle counted as you pour, with alerts before you <span class="hl">run out</span>.</p>
+        <div class="bviz viz-stock" aria-hidden="true">
+          <div class="vpanel">
+            <div class="vrow"><span class="vname">Kingfisher Pint</span><span class="vamt"><span class="vflip" style="--fh:13px"><span>42 left</span><span>31 left</span></span></span><span class="vlevel"><span style="--v:.84; --v2:.62"></span></span></div>
+            <div class="vrow"><span class="vname">Old Monk 750ml</span><span class="vamt"><span class="vflip" style="--fh:13px"><span>15 left</span><span>11 left</span></span></span><span class="vlevel"><span style="--v:.62; --v2:.46"></span></span></div>
+            <div class="vrow low"><span class="vname">Blenders Pride</span><span class="vamt"><span class="vflip" style="--fh:13px"><span>7 left</span><span>4 left</span></span></span><span class="vslot"><span class="vchip">Low</span></span><span class="vlevel"><span style="--v:.29; --v2:.17"></span></span></div>
+          </div>
+        </div>
       </div>
-
-      <div class="spanel cool f-ledger reveal">
-        <div class="sbrand"><img src="veron-icon.png" alt="" />VERON</div>
-        <div class="shead-big"><span class="num">₹</span>Customer accounts</div>
-        <p class="ssub">Record udhaar and keep <span class="hl">one clean ledger</span> for every regular.</p>
+      <div class="bcard b-ledger reveal">
+        <h3 class="btitle">Udhaar, finally tidy</h3>
+        <p class="bdesc">Record udhaar and keep <span class="hl">one clean ledger</span> for every regular.</p>
+        <div class="bviz viz-ledger" aria-hidden="true">
+          <div class="vpanel">
+            <div class="vbar">Udhaar &middot; this week</div>
+            <div class="vrow"><span class="vav">RB</span><span class="vname">Ramesh Bhai</span><span class="vamt">&#8377;1,240</span></div>
+            <div class="vrow vsettle"><span class="vav">SK</span><span class="vname">Salim Khan</span><span class="vamt">&#8377;360</span><span class="vchip"><span class="vflip" style="--fh:11px"><span>Open</span><span>Paid</span></span></span></div>
+            <div class="vfoot"><span>Still owed</span><b><span class="vflip" style="--fh:15px"><span>&#8377;1,600</span><span>&#8377;1,240</span></span></b></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1060,9 +1480,18 @@
       <p>No installers to chase, no technician visit, no waiting on approval — you can be taking money by the end of the day.</p>
     </div>
     <div class="steps">
-      <div class="step warm reveal"><h3 class="shead-big"><span class="num">10 min</span>Install on your PC</h3><p class="ssub">Download VERON straight to the billing computer already sitting at your counter. There is no server to configure and <span class="hl">no special hardware to buy</span> — if it runs Windows, it runs VERON, and you are billing the same afternoon.</p></div>
-      <div class="step cool reveal"><h3 class="shead-big"><span class="num">Once</span>Set up your shop</h3><p class="ssub">Add your tables, menu, rates and staff in a single sitting. Import your item list, set taxes and discounts one time, and <span class="hl">every bill after that is a tap</span> — you never re-enter the same thing twice.</p></div>
-      <div class="step warm reveal"><h3 class="shead-big"><span class="num">Day 1</span>Start selling</h3><p class="ssub">Ring up orders, split payments, print receipts and track stock from one screen your team picks up in an afternoon. Every bill writes to your own machine first, so the day's sales and inventory stay <span class="hl">live on your phone wherever you are</span>.</p></div>
+      <div class="step reveal">
+        <h3 class="shead-big"><span class="num">10 min</span>Install on your PC</h3>
+        <p class="ssub">Download VERON straight to the billing computer already sitting at your counter. There is no server to configure and <span class="hl">no special hardware to buy</span> &mdash; if it runs Windows, it runs VERON, and you are billing the same afternoon.</p>
+      </div>
+      <div class="step reveal">
+        <h3 class="shead-big"><span class="num">Once</span>Set up your shop</h3>
+        <p class="ssub">Add your tables, menu, rates and staff in a single sitting. Import your item list, set taxes and discounts one time, and <span class="hl">every bill after that is a tap</span> &mdash; you never re-enter the same thing twice.</p>
+      </div>
+      <div class="step reveal">
+        <h3 class="shead-big"><span class="num">Day 1</span>Start selling</h3>
+        <p class="ssub">Ring up orders, split payments, print receipts and track stock from one screen your team picks up in an afternoon. Every bill writes to your own machine first, so the day's sales and inventory stay <span class="hl">live on your phone wherever you are</span>.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -1119,13 +1548,13 @@
           <div class="price">₹2,499 <small>/ Month</small></div>
         </div>
         <div class="pname">Max</div>
-        <p class="pdesc">Designed for multi-counter or multi-outlet operations that need it all.</p>
+        <p class="pdesc">Designed for a busy floor that runs more than one billing counter.</p>
         <div class="flabel">Features:</div>
         <ul>
           <li>Everything in Pro</li>
           <li>Waiter ordering app</li>
           <li>Shared owner &amp; staff phone access</li>
-          <li>Multiple billing counters &amp; outlets</li>
+          <li>Multiple billing counters</li>
         </ul>
       </div>
     </div>
@@ -1141,6 +1570,11 @@
       <h2 class="cta-h">Run the floor.<span>Not the paperwork</span></h2>
       <p class="cta-p">Join the restaurants and bars billing on VERON every night. Set it up on the computer you already own and start taking orders today — no hardware to buy, no internet required.</p>
       <div class="cta-actions">
+        <!-- Points at the LATEST GitHub release asset, not a file in this repo:
+             git keeps binaries forever, so committing a 23 MB installer would
+             cost every clone 23 MB per version, permanently. /releases/latest/
+             also means this link never needs editing again when you ship an
+             update — publish the release and the site follows. -->
         <a href="https://github.com/Aditya-Bhoye/Veron/releases/latest/download/Veron.Setup.exe" class="cta-btn">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.6l7.3-1v7.1H3V5.6zm8.4-1.2L21 3v8.7h-9.6V4.4zM3 12.8h7.3v7.1l-7.3-1v-6.1zm8.4 0H21V21l-9.6-1.3v-6.9z"/></svg>
           <span><small>Download for</small><strong>Windows</strong></span>
@@ -1149,6 +1583,9 @@
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 1.4c0 1.1-.5 2.2-1.2 3-.8.8-2.2 1.5-3.3 1.4-.1-1.1.4-2.3 1.2-3 .8-.8 2.2-1.4 3.3-1.4zM20.9 17.1c-.5 1.3-.8 1.8-1.5 3-1 1.5-2.4 3.5-4.1 3.5-1.5 0-1.9-1-4-1s-2.5 1-4 1c-1.8 0-3.1-1.8-4.1-3.3C.4 16.9.1 11.7 1.9 9c1.3-1.9 3.3-3 5.2-3 2 0 3.2 1.1 4.8 1.1 1.6 0 2.5-1.1 4.8-1.1 1.7 0 3.5.9 4.8 2.5-4.2 2.3-3.6 8.3.4 8.6z"/></svg>
           <span><small>Download for</small><strong>macOS</strong></span>
         </a>
+        <!-- Same release, a second asset. Stable filename on purpose: the
+             version lives inside the APK, and /releases/latest/ means this
+             link never needs editing when a new phone build ships. -->
         <a href="https://github.com/Aditya-Bhoye/Veron/releases/latest/download/Veron.apk" class="cta-btn">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 9h12v9.2c0 .6-.5 1.1-1.1 1.1h-1.3v2.6c0 .6-.5 1.1-1.1 1.1s-1.1-.5-1.1-1.1v-2.6h-2.8v2.6c0 .6-.5 1.1-1.1 1.1s-1.1-.5-1.1-1.1v-2.6H7.1c-.6 0-1.1-.5-1.1-1.1V9zm-2.2 0c.7 0 1.2.5 1.2 1.1v5c0 .6-.5 1.1-1.2 1.1s-1.1-.5-1.1-1.1v-5c0-.6.5-1.1 1.1-1.1zm16.4 0c.6 0 1.1.5 1.1 1.1v5c0 .6-.5 1.1-1.1 1.1s-1.2-.5-1.2-1.1v-5c0-.6.5-1.1 1.2-1.1zM7.5 8c.1-1.6 1-3 2.4-3.8l-.9-1.6a.3.3 0 0 1 .5-.3l1 1.7a5.9 5.9 0 0 1 3 0l1-1.7a.3.3 0 0 1 .5.3l-.9 1.6A4.9 4.9 0 0 1 16.5 8h-9zm2.4-2.2a.6.6 0 1 0 0 1.2.6.6 0 0 0 0-1.2zm4.2 0a.6.6 0 1 0 0 1.2.6.6 0 0 0 0-1.2z"/></svg>
           <span><small>Download for</small><strong>Android</strong></span>
@@ -1274,7 +1711,7 @@
       <details><summary>How is the licence delivered?</summary><p>Instantly. The licence is digital and activates inside the app the moment your payment is confirmed. Nothing is shipped.</p></details>
       <details><summary>Will I be charged automatically every month?</summary><p>No. There is no auto-renewal and we do not store your card. Your licence simply expires at the end of the 30 days unless you choose to pay again.</p></details>
       <details><summary>Who owns my data?</summary><p>You do. Your business data lives on your own computer. On the cloud plans it is also backed up to secure storage, scoped privately to your shop. We never sell your data.</p></details>
-      <details><summary>Can I run more than one outlet?</summary><p>Yes — the Max plan supports multiple counters and multiple outlets under one owner account.</p></details>
+      <details><summary>Can I run more than one billing counter?</summary><p>Yes — the Max plan runs unlimited billing counters in one shop, so several tills can bill at once and share the same live data. Each account covers a single shop; a second shop needs its own account and licence.</p></details>
     </div>
   </div>
 </dialog>
