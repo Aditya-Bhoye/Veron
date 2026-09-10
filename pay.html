@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Payment — VERON</title>
+<meta name="description" content="Secure payment for your VERON licence." />
+<meta name="robots" content="noindex" />
+<link rel="icon" href="veron-favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#0B0B0C; --bg2:#111113;
+  --text:#F4F4F5; --muted:#A1A1AA; --faint:#71717A;
+  --line:rgba(255,255,255,0.08); --line2:rgba(255,255,255,0.14);
+  --accent:#E23B3B; --accent2:#FF6A4D;
+  --ok:#22C55E;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:'Outfit',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+  display:flex; flex-direction:column; min-height:100%;
+}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px;width:100%}
+header{border-bottom:1px solid var(--line);background:var(--bg2)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{
+  font-weight:800;letter-spacing:2px;font-size:17px;text-decoration:none;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:56px 0}
+.card{
+  max-width:460px;margin:0 auto;text-align:center;
+  border:1px solid var(--line);border-radius:16px;
+  background:var(--bg2);padding:40px 32px;
+}
+h1{font-size:22px;line-height:1.3;letter-spacing:-0.3px;margin:0 0 10px}
+p{color:var(--muted);font-size:15px;margin:0 0 6px}
+.small{font-size:13.5px;color:var(--faint);margin-top:18px}
+a{color:var(--accent2)}
+.spinner{
+  width:34px;height:34px;margin:0 auto 22px;
+  border:3px solid var(--line2);border-top-color:var(--accent);
+  border-radius:50%;animation:spin 700ms linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tick{
+  width:52px;height:52px;margin:0 auto 20px;border-radius:50%;
+  background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;color:var(--ok);line-height:1;
+}
+.warn{
+  width:52px;height:52px;margin:0 auto 20px;border-radius:50%;
+  background:rgba(226,59,59,0.10);border:1px solid rgba(226,59,59,0.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;color:var(--accent);line-height:1;
+}
+footer{border-top:1px solid var(--line);padding:22px 0;color:var(--faint);font-size:13px;text-align:center}
+footer a{color:var(--faint);text-decoration:none}
+footer a:hover{color:var(--muted)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap"><a class="brand" href="./">VERON</a></div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <!-- Handing off to Cashfree. -->
+    <div class="card" id="loading" hidden>
+      <div class="spinner"></div>
+      <h1>Taking you to the payment page</h1>
+      <p>One moment — you are being handed to Cashfree, our payment provider.</p>
+      <p class="small">Do not close this window.</p>
+    </div>
+
+    <!-- Came back after paying. -->
+    <div class="card" id="done" hidden>
+      <div class="tick">&#10003;</div>
+      <h1>Payment received</h1>
+      <p>Thank you. Your licence is being activated.</p>
+      <p class="small">
+        You can close this window and return to VERON — the app unlocks by itself,
+        usually within a few seconds.
+      </p>
+    </div>
+
+    <!-- Nothing to pay for, or the handoff failed. -->
+    <div class="card" id="error" hidden>
+      <div class="warn">!</div>
+      <h1 id="error-title">This payment link is not valid</h1>
+      <p id="error-body">
+        It may have already been used, or it expired. Nothing has been charged.
+      </p>
+      <p class="small">
+        Open VERON and choose your plan again to start a fresh payment.
+        If it keeps happening, email
+        <a href="mailto:adibhoye@gmail.com">adibhoye@gmail.com</a>.
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    &copy; <span class="yr">2026</span> VERON &nbsp;·&nbsp;
+    <a href="privacy.html">Privacy</a> &nbsp;·&nbsp;
+    <a href="terms.html">Terms</a> &nbsp;·&nbsp;
+    <a href="./">Home</a>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.yr').forEach(function (el) {
+  el.textContent = new Date().getFullYear();
+});
+
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var session = params.get('session');
+  var mode = params.get('mode') === 'sandbox' ? 'sandbox' : 'production';
+  var paid = params.get('paid');
+
+  function show(id) {
+    ['loading', 'done', 'error'].forEach(function (x) {
+      document.getElementById(x).hidden = (x !== id);
+    });
+  }
+
+  function fail(title, body) {
+    if (title) document.getElementById('error-title').textContent = title;
+    if (body) document.getElementById('error-body').textContent = body;
+    show('error');
+  }
+
+  // ── The return leg ────────────────────────────────────────────────────────
+  // create-payment sets this page as the order's return_url. Cashfree sends the
+  // payer back here once they are done. This says nothing about whether the
+  // money actually arrived - only the webhook decides that, and the app is
+  // already watching for it. So the wording promises activation, never a
+  // specific outcome we have not verified.
+  if (paid) { show('done'); return; }
+
+  if (!session) {
+    fail(
+      'Nothing to pay for',
+      'This page opens by itself when you buy a plan inside VERON. ' +
+      'There is no payment waiting here.'
+    );
+    return;
+  }
+
+  show('loading');
+
+  // ── The handoff ───────────────────────────────────────────────────────────
+  // Cashfree's Orders API returns a payment_session_id, not a URL, and their
+  // hosted checkout can only be opened by this SDK - there is no plain link to
+  // redirect to (their own docs say so, and the payments.cashfree.com/order/#
+  // form was tried against live sessions and refused). A Windows till cannot
+  // host JavaScript, so this page does it instead: the app opens a normal URL
+  // here, and here the SDK takes over.
+  var sdk = document.createElement('script');
+  sdk.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+
+  sdk.onload = function () {
+    try {
+      var cashfree = Cashfree({ mode: mode });
+      cashfree.checkout({ paymentSessionId: session, redirectTarget: '_self' });
+    } catch (e) {
+      fail(
+        'Could not open the payment page',
+        'Something went wrong handing you to our payment provider. ' +
+        'Nothing has been charged. Please try again from VERON.'
+      );
+    }
+  };
+
+  // A blocked or offline CDN must say so rather than leave a spinner turning
+  // forever - the payer needs to know they can safely walk away.
+  sdk.onerror = function () {
+    fail(
+      'Could not reach the payment provider',
+      'Check your internet connection and try again from VERON. ' +
+      'Nothing has been charged.'
+    );
+  };
+
+  document.head.appendChild(sdk);
+})();
+</script>
+</body>
+</html>
