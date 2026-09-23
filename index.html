@@ -813,6 +813,23 @@
     background-repeat:no-repeat;background-position:center;background-size:10px}
   .plan.featured li::before{border-color:rgba(226,59,59,0.4);background-color:rgba(226,59,59,0.08);
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FF6A4D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E")}
+  /* Edition switch: the price is a property of (kind of shop, plan), exactly as
+     the server's plan_prices is. One segmented pill above the cards. */
+  .edition-switch{display:flex;justify-content:center;margin:0 0 28px;position:relative;z-index:1}
+  .edition-switch .seg{display:inline-flex;gap:4px;padding:5px;background:var(--panel);border:1px solid var(--line2);border-radius:999px}
+  .edition-switch button{font:inherit;font-size:14px;font-weight:700;color:var(--muted);background:none;border:0;
+    border-radius:999px;padding:9px 20px;cursor:pointer;transition:color .2s,background-color .2s,box-shadow .2s}
+  .edition-switch button:hover{color:var(--text)}
+  .edition-switch button[aria-pressed="true"]{color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 14px rgba(226,59,59,0.45)}
+  .edition-switch button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+  @media(max-width:420px){.edition-switch button{padding:8px 13px;font-size:13px}}
+  /* .plan is display:flex, which would otherwise beat the hidden attribute. */
+  .plan[hidden]{display:none}
+  .plans.two{grid-template-columns:repeat(2,1fr);max-width:820px;margin:0 auto}
+  @media(max-width:860px){.plans.two{grid-template-columns:1fr;max-width:420px}}
+  .plan .price, .plan ul{transition:opacity .18s ease}
+  .plans.swap .price, .plans.swap ul{opacity:0}
   .pricenote{text-align:center;color:var(--faint);font-size:13.5px;margin-top:34px;max-width:640px;margin-left:auto;margin-right:auto}
 
   /* FAQ */
@@ -1509,14 +1526,21 @@
         <div>
           <h2 class="ptitle">Our pricing plans</h2>
         </div>
-        <p class="pricing-desc">One licence per shop, per month. No card is stored, and there is no auto-renewal.</p>
+        <p class="pricing-desc">One licence per shop, per month, priced for your kind of shop. No card is stored, and there is no auto-renewal.</p>
       </div>
     </div>
-    <div class="plans">
-      <div class="plan reveal">
+    <div class="edition-switch reveal">
+      <div class="seg" role="group" aria-label="Kind of shop">
+        <button type="button" data-edition="restaurant" aria-pressed="true">Restaurant</button>
+        <button type="button" data-edition="bar" aria-pressed="false">Bar</button>
+        <button type="button" data-edition="liquor" aria-pressed="false">Liquor Shop</button>
+      </div>
+    </div>
+    <div class="plans" aria-live="polite">
+      <div class="plan reveal" data-plan="basic">
         <div class="plan-top">
           <div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-          <div class="price">₹999 <small>/ Month</small></div>
+          <div class="price">₹499 <small>/ Month</small></div>
         </div>
         <div class="pname">Basic</div>
         <p class="pdesc">Perfect for a single counter that wants full billing without needing the internet.</p>
@@ -1528,10 +1552,10 @@
           <li>All reports on the PC</li>
         </ul>
       </div>
-      <div class="plan featured reveal">
+      <div class="plan featured reveal" data-plan="pro">
         <div class="plan-top">
           <div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19a4.5 4.5 0 000-9 6 6 0 00-11.4 2A4 4 0 007 19h10.5z"/></svg></div>
-          <div class="price">₹1,599 <small>/ Month</small></div>
+          <div class="price">₹1,299 <small>/ Month</small></div>
         </div>
         <div class="pname">Pro</div>
         <p class="pdesc">Ideal for owners who want to see sales live and keep a secure cloud backup.</p>
@@ -1542,7 +1566,7 @@
           <li>Owner's mobile app</li>
         </ul>
       </div>
-      <div class="plan reveal">
+      <div class="plan reveal" data-plan="max">
         <div class="plan-top">
           <div class="picon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
           <div class="price">₹2,499 <small>/ Month</small></div>
@@ -1874,6 +1898,57 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
   }, {threshold:0.15});
   revealEls.forEach(function(el){ io.observe(el); });
 }
+
+// Edition switch. Mirrors supabase/migrations/20260916000003_the_price_list.sql
+// (the server's plan_prices, which is what Cashfree actually charges) — change
+// a price there and change it here. A liquor shop is not sold Basic, and has
+// no floor, so its Max card has no waiter app.
+var PRICE_LIST = {
+  restaurant: {basic: 499, pro: 1299, max: 2499},
+  bar:        {basic: 999, pro: 1599, max: 2499},
+  liquor:     {basic: null, pro: 1599, max: 2999}
+};
+var PLAN_FEATURES = {
+  basic: ['Full point-of-sale billing', 'Inventory, staff &amp; customers', 'Works with no internet', 'All reports on the PC'],
+  pro: ['Everything in Basic', 'Secure cloud backup', "Owner's mobile app"],
+  max: ['Everything in Pro', 'Waiter ordering app', 'Shared owner &amp; staff phone access', 'Multiple billing counters']
+};
+var LIQUOR_FEATURES = {
+  pro: ['Full point-of-sale billing', 'Inventory, staff &amp; customers', 'Secure cloud backup', "Owner's mobile app"],
+  max: ['Everything in Pro', 'Shared owner &amp; staff phone access', 'Multiple billing counters']
+};
+(function(){
+  var plansEl = document.querySelector('.plans');
+  var buttons = document.querySelectorAll('.edition-switch button');
+  if (!plansEl || !buttons.length) return;
+  var swapTimer;
+  function inr(n){ return '₹' + n.toLocaleString('en-IN'); }
+  function render(edition){
+    var prices = PRICE_LIST[edition];
+    var sold = 0;
+    plansEl.querySelectorAll('.plan').forEach(function(card){
+      var plan = card.getAttribute('data-plan');
+      var price = prices[plan];
+      card.hidden = price == null;
+      if (price == null) return;
+      sold++;
+      card.querySelector('.price').innerHTML = inr(price) + ' <small>/ Month</small>';
+      var feats = (edition === 'liquor' && LIQUOR_FEATURES[plan]) || PLAN_FEATURES[plan];
+      card.querySelector('ul').innerHTML = feats.map(function(f){ return '<li>' + f + '</li>'; }).join('');
+    });
+    plansEl.classList.toggle('two', sold === 2);
+  }
+  function select(edition){
+    buttons.forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-edition') === edition)); });
+    if (reduceMotion) { render(edition); return; }
+    clearTimeout(swapTimer);
+    plansEl.classList.add('swap');
+    swapTimer = setTimeout(function(){ render(edition); plansEl.classList.remove('swap'); }, 180);
+  }
+  buttons.forEach(function(b){
+    b.addEventListener('click', function(){ select(b.getAttribute('data-edition')); });
+  });
+})();
 
 // The featured plan's spin+breathe only run while it's actually on screen —
 // unlike the reveal observer above, this one keeps watching (no unobserve)
