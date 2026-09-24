@@ -3,13 +3,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VERON — Point-of-Sale Software for Restaurants &amp; Bars</title>
-<meta name="description" content="VERON is offline-first point-of-sale software for restaurants, bars and hotels in India — fast billing, live inventory, staff and customer accounts, with an owner's mobile app that shows your sales live." />
-<meta property="og:title" content="VERON — Point-of-Sale for Restaurants & Bars" />
-<meta property="og:description" content="Fast billing, live inventory, staff and customer accounts. Works fully offline, with an owner's mobile app." />
-<meta property="og:image" content="veron-icon.png" />
+<title>VERON — POS &amp; Billing Software for Bars, Liquor Shops and Restaurants</title>
+<meta name="description" content="VERON is point-of-sale and billing software for bars, liquor shops and restaurants in India — live stock for every brand and bottle size, fast billing, udhaar and staff accounts, with an owner's app that shows sales and stock live." />
+<meta property="og:title" content="VERON — POS for Bars, Liquor Shops & Restaurants" />
+<meta property="og:description" content="Live bottle stock for every brand and size, fast billing, udhaar and staff — with an owner's app that shows sales and stock live." />
+<meta property="og:image" content="https://aditya-bhoye.github.io/Veron/hero-poster.jpg" />
 <meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content="summary_large_image" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"VERON","applicationCategory":"BusinessApplication","operatingSystem":"Windows, Android","description":"Point-of-sale and billing software for bars, liquor shops and restaurants in India, with live stock for every brand and bottle size, udhaar and staff accounts, and an owner's app that shows sales and stock live.","url":"https://aditya-bhoye.github.io/Veron/","image":"https://aditya-bhoye.github.io/Veron/hero-poster.jpg","offers":{"@type":"AggregateOffer","priceCurrency":"INR","lowPrice":"499","highPrice":"2999","offerCount":"8"}}
+</script>
 <!-- SVG favicon clips the square source art to a circle, so the tab icon is
      round like the logo everywhere else. PNG stays as the fallback. -->
 <link rel="icon" type="image/svg+xml" href="veron-favicon.svg" />
@@ -1180,10 +1183,14 @@
     position: relative;
     box-shadow: 0 0 120px -20px rgba(255,106,77,0.25), 0 0 160px -30px rgba(124,108,246,0.2);
   }
-  .new-shot img {
+  .new-shot img, .new-shot video {
     width: 100%;
     display: block;
   }
+  /* The walkthrough is 16:9. Reserving the box up front means the poster and
+     the video land without shifting the page, and the frame never collapses
+     while the file is still on its way. */
+  .new-shot video { aspect-ratio: 16 / 9; height: auto; background: #0a0a0a; object-fit: cover; }
 
   /* Hero on small screens. The decorative shapes are a fixed 600px square
      pinned 450px off each edge — at phone widths that reads as a wall rather
@@ -1355,7 +1362,7 @@
       <span class="line2">BILLING TO INVENTORY, LIVE ON YOUR SCREEN</span>
     </h1>
 
-    <p class="new-p">VERON is point-of-sale software built for the pace of restaurants and bars. Fast billing, live inventory tracking, staff management, customer accounts — everything works fully offline on your own computer, with a mobile app to watch your sales live.</p>
+    <p class="new-p">VERON is point-of-sale software built for bars, liquor shops and restaurants. Live stock for every brand and bottle size, fast billing, staff and udhaar accounts — all on your own computer, even offline, with a mobile app to watch sales and stock live.</p>
     
     <a href="#download" class="new-btn">Download
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -1369,7 +1376,10 @@
     <div class="shotcard sc-4"><span class="sc-av">R</span>Ramesh <b>present</b></div>
     <div class="new-shot-topglow"></div>
     <div class="new-shot">
-      <img src="dashboard-screenshot.png" alt="VERON dashboard">
+      <video class="hero-video" id="heroVideo" muted loop playsinline disablepictureinpicture
+             preload="none" poster="hero-poster.jpg" width="1920" height="1080"
+             data-src-hd="hero-1080.mp4" data-src-sd="hero-720.mp4"
+             aria-label="VERON walkthrough: billing, tables, inventory, kitchen, daily sale, customers and staff"></video>
     </div>
   </div>
 </div>
@@ -1379,7 +1389,7 @@
   <div class="wrap">
     <div class="shead reveal">
       <h2>One app for the whole shop</h2>
-      <p>Built for the pace of a real restaurant floor — on the machine you already own.</p>
+      <p>Built for the pace of a busy bar, a liquor counter or a restaurant floor — on the machine you already own.</p>
     </div>
     <div class="bento">
       <div class="bcard b-offline reveal">
@@ -1592,7 +1602,7 @@
     <div class="cta-inner">
     <div class="cta-copy">
       <h2 class="cta-h">Run the floor.<span>Not the paperwork</span></h2>
-      <p class="cta-p">Join the restaurants and bars billing on VERON every night. Set it up on the computer you already own and start taking orders today — no hardware to buy, no internet required.</p>
+      <p class="cta-p">Join the bars, liquor shops and restaurants billing on VERON every night. Set it up on the computer you already own and start taking orders today — no hardware to buy, no internet required.</p>
       <div class="cta-actions">
         <!-- Points at the LATEST GitHub release asset, not a file in this repo:
              git keeps binaries forever, so committing a 23 MB installer would
@@ -1667,7 +1677,7 @@
       <div class="foot-top">
         <div class="foot-about">
           <div class="name">VERON</div>
-          <p>Point-of-sale software for restaurants and bars — fast billing, live stock and staff, running fully offline on the computer you already own.</p>
+          <p>Point-of-sale software for bars, liquor shops and restaurants — fast billing, live stock and staff, running fully offline on the computer you already own.</p>
         </div>
 
         <div class="foot-col">
@@ -1727,6 +1737,7 @@
   <div class="modal-body">
     <div class="faq">
       <details><summary>Does VERON need the internet to work?</summary><p>No. VERON runs fully offline on your computer — you can bill all day with no connection. Internet is only used to back up your data and to power the owner's mobile app on the paid plans.</p></details>
+      <details><summary>Does VERON work for a liquor shop?</summary><p>Yes. The Liquor Shop edition is a fast counter built around stock: every bottle sold updates the stock for its brand and size, and opening, received, sales and closing are kept date by date. It leaves out tables and the kitchen, which a bottle shop does not need, and is sold on the Pro and Max plans.</p></details>
       <details><summary>Is there a free trial?</summary><p>No — VERON is sold as a monthly licence, with no trial period. If you would like to see the software before buying, get in touch and we will be happy to show you.</p></details>
       <details><summary>How is the licence delivered?</summary><p>Instantly. The licence is digital and activates inside the app the moment your payment is confirmed. Nothing is shipped.</p></details>
       <details><summary>Will I be charged automatically every month?</summary><p>No. There is no auto-renewal and we do not store your card. Your licence simply expires at the end of the 30 days unless you choose to pay again.</p></details>
@@ -1898,6 +1909,43 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
   }, {threshold:0.15});
   revealEls.forEach(function(el){ io.observe(el); });
 }
+
+// Hero walkthrough. A 2-minute video is the heaviest thing on the page, so it
+// waits its turn: nothing downloads until the page has loaded and gone idle,
+// a phone or a data-saver connection gets the 720p file, reduced motion keeps
+// the still poster, and it only plays while it can actually be seen.
+(function(){
+  var v = document.getElementById('heroVideo');
+  if (!v) return;
+  if (reduceMotion) return;
+  var conn = navigator.connection || {};
+  var small = window.matchMedia('(max-width: 900px)').matches;
+  var src = (small || conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '')) ? v.dataset.srcSd : v.dataset.srcHd;
+  var visible = true, started = false;
+  function tryPlay(){ if (visible) { var p = v.play(); if (p && p.catch) p.catch(function(){}); } }
+  function start(){
+    if (started) return;
+    started = true;
+    v.src = src;
+    v.preload = 'auto';
+    v.addEventListener('canplay', tryPlay, {once:true});
+    v.load();
+  }
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function(entries){
+      visible = entries[0].isIntersecting;
+      if (!started) return;
+      if (visible) tryPlay(); else v.pause();
+    }, {threshold: 0.15}).observe(v);
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (!started) return;
+    if (document.hidden) v.pause(); else tryPlay();
+  });
+  function whenIdle(){ (window.requestIdleCallback || function(f){ setTimeout(f, 200); })(start, {timeout: 2000}); }
+  if (document.readyState === 'complete') whenIdle();
+  else window.addEventListener('load', whenIdle, {once:true});
+})();
 
 // Edition switch: each kind of shop has its own prices. Keep these in step
 // with the server's price list, which is what a payment is actually charged at.
