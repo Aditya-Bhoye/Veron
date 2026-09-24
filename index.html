@@ -1899,10 +1899,10 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
   revealEls.forEach(function(el){ io.observe(el); });
 }
 
-// Edition switch. Mirrors supabase/migrations/20260916000003_the_price_list.sql
-// (the server's plan_prices, which is what Cashfree actually charges) — change
-// a price there and change it here. A liquor shop is not sold Basic, and has
-// no floor, so its Max card has no waiter app.
+// Edition switch: each kind of shop has its own prices. Keep these in step
+// with the server's price list, which is what a payment is actually charged at.
+// A liquor shop is not sold Basic, and has no floor, so its Max card has no
+// waiter app.
 var PRICE_LIST = {
   restaurant: {basic: 499, pro: 1299, max: 2499},
   bar:        {basic: 999, pro: 1599, max: 2499},
